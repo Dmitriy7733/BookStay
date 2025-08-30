@@ -14,9 +14,15 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        
+      * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }  
         body {
     display: flex;
     flex-direction: column;
@@ -32,12 +38,6 @@ if (session_status() === PHP_SESSION_NONE) {
     overflow-x: hidden; /* Скрыть горизонтальный скроллинг */
 }
 /* Стили для навигационного меню */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
         
         .container {
             max-width: 1200px;
@@ -193,84 +193,6 @@ if (session_status() === PHP_SESSION_NONE) {
         .link_in_nav:hover {
             color: #051b62 !important;
             background-color: #f0f5ff;
-        }
-        
-        /* Административная панель */
-        .admin-panel {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
-        }
-        
-        .admin-panel h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-        
-        .admin-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #2c3e50;
-            font-weight: 500;
-        }
-        
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-        
-        .form-group input:focus, .form-group select:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-        
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .code-block {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 30px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .code-block h3 {
-            margin-bottom: 15px;
-            color: #3498db;
         }
         
         /* Стили для Swiper слайдов */
@@ -506,8 +428,9 @@ if (session_status() === PHP_SESSION_NONE) {
         
         .search-form {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             gap: 15px;
+            align-items: flex-end;
         }
         
         .search-row {
@@ -557,6 +480,7 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #6c757d;
         }
         
+        
         .search-btn {
             background: #007bff;
             color: white;
@@ -567,10 +491,8 @@ if (session_status() === PHP_SESSION_NONE) {
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 10px;
-            align-self: flex-start;
+            height: 45px;
         }
-        
         .search-btn:hover {
             background: #0056b3;
         }
@@ -582,10 +504,6 @@ if (session_status() === PHP_SESSION_NONE) {
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border: none;
             min-width: 300px;
-        }
-        
-        .calendar-container {
-            padding: 15px;
         }
         
         .people-selector {
@@ -655,10 +573,6 @@ if (session_status() === PHP_SESSION_NONE) {
     border: none;
 }
 
-.calendar-dropdown {
-    min-width: 350px;
-}
-
 .people-dropdown {
     min-width: 250px;
 }
@@ -679,6 +593,277 @@ if (session_status() === PHP_SESSION_NONE) {
 .show-dropdown {
     display: block !important;
 }
+/*для календаря*/
+.calendar-input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+    color: inherit;
+    outline: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    opacity: 0; /* Скрываем input, но оставляем кликабельным */
+    cursor: pointer;
+    z-index: 2;
+}
+
+.search-field {
+    position: relative; /* Для абсолютного позиционирования input */
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.field-text {
+    flex-grow: 1;
+    position: relative;
+    z-index: 1; /* Текст под input */
+}
+.selected-value {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.placeholder {
+    color: #6c757d;
+}
+    /* Основные стили для карточки объявления */
+.goods {
+    display: flex;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.goods:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.goods__image {
+    width: 280px;
+    min-width: 280px;
+    position: relative;
+}
+
+.goods__image a {
+    display: block;
+    width: 100%;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    text-decoration: none;
+}
+
+.goods__content {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.goods__title {
+    margin-bottom: 12px;
+}
+
+.goods__title a {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.goods__title a:hover {
+    color: #e74c3c;
+}
+
+.goods__content_row {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+}
+
+.goods__detail {
+    flex: 2;
+}
+
+.goods__detail ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+
+.goods__detail li {
+    margin-bottom: 8px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.goods__detail li strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.goods__price {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.goods__price_title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.goods__price_value {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.goods__price_value li {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.goods__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 180px;
+}
+.goods__views {
+    text-align: right;
+}
+
+.goods__views a {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.goods__views a:hover {
+    text-decoration: underline;
+}
+
+.goods__views_lg {
+    display: block;
+}
+
+.goods__views_sm {
+    display: none;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .goods {
+        flex-direction: column;
+    }
+    
+    .goods__image {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .goods__image a {
+        height: 200px;
+    }
+    
+    .goods__content_row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .goods__views_lg {
+        display: none;
+    }
+    
+    .goods__views_sm {
+        display: block;
+        margin-top: 10px;
+    }
+}
+
+/* Стили для заголовков и контейнеров */
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.hide_xs {
+    display: inline;
+}
+
+@media (max-width: 480px) {
+    .hide_xs {
+        display: none;
+    }
+}
+
+/* Стили для специальных элементов */
+.slide_hover {
+    position: relative;
+}
+
+.slide_hover:hover::after {
+    content: "Еще фото";
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+#listingsContainer, #categoriesContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#listingsContent h3 {
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+#backToCategories {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.3s ease;
+}
+
+#backToCategories:hover {
+    background: #2980b9;
+}
+    
     </style>
 </head>
 <body>
@@ -689,7 +874,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="#">
             <img src="/app/includes/free-icon-appliances.png" alt="Логотип" style="height: 40px; margin-right: 10px;">
-            Инструкции для техники
+            Курортик
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
             <span class="navbar-toggler-icon"></span>
@@ -711,54 +896,57 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <!-- Навигационное меню с категориями -->
     <div class="container">
-        <div class="nav">
-            <div class="nav__container">
-                <div class="nav__fluid">
-                    <div class="nav__arrow nav__arrow_prev">
-                        <a href="#" class="nav_prev" tabindex="0" role="button" aria-label="Previous slide">
-                            <i class="fas fa-angle-left"></i>
-                        </a>
-                    </div>
+    <div class="nav">
+        <div class="nav__container">
+            <div class="nav__fluid">
+                <div class="nav__arrow nav__arrow_prev">
+                    <a href="#" class="nav_prev" tabindex="0" role="button" aria-label="Previous slide">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </div>
 
-                    <div itemscope itemtype="http://www.schema.org/SiteNavigationElement" class="nav__fluid_slider swiper-container">
-                        <div class="swiper-wrapper">
-                            <?php foreach ($navCategories as $category): ?>
-                                <div itemprop="name" class="swiper-slide" data-id="<?= htmlspecialchars($category['id']) ?>">
-                                    <a itemprop="url" class="parent" href="?category=<?= htmlspecialchars($category['id']) ?>">
-                                        <span><?= htmlspecialchars($category['name']) ?></span>
-                                        
-                                        <?php if (!empty($category['subcategories'])): ?>
-                                            <i class="fas fa-caret-down"></i>
-                                        <?php endif; ?>
-                                    </a>
+                <div itemscope itemtype="http://www.schema.org/SiteNavigationElement" class="nav__fluid_slider swiper-container">
+                    <div class="swiper-wrapper">
+                        <?php foreach ($navCategories as $category): ?>
+                            <div itemprop="name" class="swiper-slide" data-id="<?= htmlspecialchars($category['id']) ?>">
+                                <a itemprop="url" class="parent category-link" href="#" 
+                                   data-category-id="<?= htmlspecialchars($category['id']) ?>"
+                                   data-category-name="<?= htmlspecialchars($category['name']) ?>">
+                                    <span><?= htmlspecialchars($category['name']) ?></span>
                                     
                                     <?php if (!empty($category['subcategories'])): ?>
-                                        <ul class="ul_second_nav">
-                                            <?php foreach ($category['subcategories'] as $subcategory): ?>
-                                                <li itemprop="name">
-                                                    <a itemprop="url" class="link_in_nav" href="?subcategory=<?= htmlspecialchars($subcategory['id']) ?>">
-                                                        <?= htmlspecialchars($subcategory['name']) ?>
-                                                    </a>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        </ul>
+                                        <i class="fas fa-caret-down"></i>
                                     <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
+                                </a>
+                                
+                                <?php if (!empty($category['subcategories'])): ?>
+                                    <ul class="ul_second_nav">
+                                        <?php foreach ($category['subcategories'] as $subcategory): ?>
+                                            <li itemprop="name">
+                                                <a itemprop="url" class="link_in_nav subcategory-link" href="#" 
+   data-subcategory-id="<?= htmlspecialchars($subcategory['id']) ?>"
+   data-subcategory-name="<?= htmlspecialchars($subcategory['name']) ?>">
+    <?= htmlspecialchars($subcategory['name']) ?>
+</a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    
-                    <div class="nav__arrow nav__arrow_next">
-                        <a href="#" class="nav_next" tabindex="0" role="button" aria-label="Next slide">
-                            <i class="fas fa-angle-right"></i>
-                        </a>
-                    </div>
+                </div>
+                
+                <div class="nav__arrow nav__arrow_next">
+                    <a href="#" class="nav_next" tabindex="0" role="button" aria-label="Next slide">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-<!-- НАЧАЛО ВСТАВКИ НОВОГО БЛОКА ПОИСКА -->
+<!-- БЛОК ПОИСКА -->
 <div class="container">
     <!-- Форма поиска -->
     <div class="search-container">
@@ -776,25 +964,26 @@ if (session_status() === PHP_SESSION_NONE) {
                 </div>
                 
                 <!-- Поле для выбора даты заезда -->
-                <div class="search-field" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="checkinField">
-                    <i class="fas fa-calendar-alt"></i>
-                    <div class="field-text">
-                        <span class="placeholder" id="checkinPlaceholder">Дата заезда</span>
-                        <span class="selected-value" id="checkinValue" style="display:none"></span>
-                    </div>
-                    <input type="hidden" id="dateFrom-input" name="dateFrom" value="">
-                </div>
-                
-                <!-- Поле для выбора даты выезда -->
-                <div class="search-field" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="checkoutField">
-                    <i class="fas fa-calendar-alt"></i>
-                    <div class="field-text">
-                        <span class="placeholder" id="checkoutPlaceholder">Дата выезда</span>
-                        <span class="selected-value" id="checkoutValue" style="display:none"></span>
-                    </div>
-                    <input type="hidden" id="dateTo-input" name="dateTo" value="">
-                </div>
-                
+<div class="search-field date-field" id="checkinField">
+    <i class="fas fa-calendar-alt"></i>
+    <div class="field-text">
+        <span class="placeholder" id="checkinPlaceholder">Дата заезда</span>
+        <span class="selected-value" id="checkinValue" style="display:none"></span>
+    </div>
+    <input type="text" id="dateFrom-input" name="dateFrom" class="calendar-input" 
+    placeholder="" aria-label="Дата заезда">
+</div>
+
+<!-- Поле для выбора даты выезда -->
+<div class="search-field date-field" id="checkoutField">
+    <i class="fas fa-calendar-alt"></i>
+    <div class="field-text">
+        <span class="placeholder" id="checkoutPlaceholder">Дата выезда</span>
+        <span class="selected-value" id="checkoutValue" style="display:none"></span>
+    </div>
+    <input type="text" id="dateTo-input" name="dateTo" class="calendar-input" 
+    placeholder="" aria-label="Дата выезда">
+</div>
                 <!-- Поле для выбора количества людей -->
                 <div class="search-field" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="peopleField">
                     <i class="fas fa-users"></i>
@@ -811,14 +1000,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 <i class="fas fa-search"></i> Найти
             </button>
         </form>
-    </div>
-</div>
-<!-- Выпадающее меню для выбора дат -->
-<div class="dropdown-menu dropdown-menu-custom calendar-dropdown" id="calendarDropdown">
-    <div class="calendar-container">
-        <h5>Выберите даты</h5>
-        <p>Здесь будет календарь для выбора дат</p>
-        <button class="btn btn-primary btn-sm" id="applyDates">Применить</button>
     </div>
 </div>
 
@@ -849,47 +1030,65 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 </div>
 </div>
-<!-- КОНЕЦ ВСТАВКИ НОВОГО БЛОКА ПОИСКА -->
+<!-- БЛОК ПОИСКА конец-->
 
 <div class="container">
-    <h2 class="text-center">Инструкции и руководства по эксплуатации техники</h2>
-
-    <div class="row">
+    <h2 id="mainTitle" class="text-center">Популярные направления для отдыха</h2>
+    <!-- Контейнер для категорий -->
+    <div id="categoriesContainer" class="row">
         <?php
         // Отображаем категории и подкатегории
         foreach ($categoryGroups as $category) {
-            echo "<div class='col-md-6 mb-4'>"; // Используем col-md-6 для двух столбцов
-            echo "<div class='card shadow-sm'>"; // Добавляем карточку с тенью
-            echo "<div class='card-body'>";
+            echo "<div class='col-xl-3 col-lg-4 col-md-6 mb-4'>";
+            echo "<div class='card shadow-sm h-100'>";
+            echo "<div class='card-body d-flex flex-column'>";
             echo "<h5 class='card-title'>{$category['name']}</h5>";
-            echo "<div class='dropdown'>";
+            echo "<div class='dropdown mt-auto'>";
             echo "<button class='btn btn-primary dropdown-toggle btn-block' type='button' id='categoryDropdown{$category['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Выбрать подкатегорию</button>";
             echo "<div class='dropdown-menu' aria-labelledby='categoryDropdown{$category['id']}'>";
 
             // Проверяем, есть ли подкатегории
             if (!empty($category['subcategories'])) {
                 foreach ($category['subcategories'] as $subcategory) {
-                    echo "<a class='dropdown-item' href='#' data-toggle='modal' data-target='#instructionsListModal' data-subcategory-id='{$subcategory['id']}'>{$subcategory['name']}</a>";
+                    echo "<a class='dropdown-item subcategory-link' href='#' data-subcategory-id='{$subcategory['id']}' data-subcategory-name='{$subcategory['name']}'>{$subcategory['name']}</a>";
                 }
             } else {
                 echo "<a class='dropdown-item disabled' href='#'>Нет подкатегорий</a>";
             }
 
-            echo "</div></div>"; // Закрываем dropdown
-            echo "</div>"; // Закрываем card-body
-            echo "</div>"; // Закрываем card
-            echo "</div>"; // Закрываем div.col-md-6
+            echo "</div></div>";
+            echo "</div>";
+            echo "</div>";
+            echo "</div>";
         }
         ?>
     </div>
-</div>
     
+    <!-- Контейнер для объявлений с кнопкой возврата -->
+    <div id="listingsContainer" class="row listings-container" style="display: none;">
+        <!-- Кнопка возврата к категориям -->
+        <div class="col-12 mb-4">
+            <button id="backToCategories" class="btn btn-secondary back-to-categories">
+                <i class="fas fa-arrow-left"></i> Назад к категориям
+            </button>
+        </div>
+        <!-- Здесь будут появляться объявления -->
+        <div id="listingsContent" class="col-12"></div>
+    </div>
+    <!-- Заголовок для результатов поиска -->
+        <div id="searchResultsTitle" class="col-12 mb-4" style="display: none; text-align: center;">
+            <h3>Результаты поиска</h3>
+        </div>
+        <!-- Здесь будут появляться объявления -->
+        <div id="listingsContent" class="col-12"></div>
+        <!-- Пагинация для результатов поиска -->
+        <div id="searchPagination" class="col-12 mt-4" style="display: none;"></div>
 </div>
 
 </main>
 <!-- footer.php -->
     
-<footer class="bg-secondary text-white text-center py-2">
+<footer class="bg-secondary text-black text-center py-2">
     <div class="container">
         <p class="mb-0">&copy; 2025 Инструкции для техники. Дмитрий Попов.</p>
     </div>
@@ -898,51 +1097,151 @@ if (session_status() === PHP_SESSION_NONE) {
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/search.js"></script>
-<script src="../assets/instructions.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 <script src="../assets/download.js"></script>
-<script src="../assets/complaint.js"></script>
+<script src="../assets/correct.js"></script>
     <script>
-    $(document).ready(function() {
+
+
+
+
+// Обработчик клика по подкатегории
+$(document).on('click', '.subcategory-link', function(e) {
+    e.preventDefault();
+    
+    const subcategoryId = $(this).data('subcategory-id');
+    const subcategoryName = $(this).data('subcategory-name');
+    
+    // Меняем заголовок
+    const correctForm = getCorrectPrepositionForm(subcategoryName);
+    $('#mainTitle').text(`Отдых в ${correctForm}`);
+    
+    // Показываем контейнер с объявлениями, скрываем категории
+    $('#categoriesContainer').hide();
+    $('#listingsContainer').show();
+    
+    // Загружаем объявления для выбранной подкатегории
+    loadListingsBySubcategory(subcategoryId, subcategoryName);
+});
+
+// Обработчик кнопки "Назад к категориям"
+$('#backToCategories').on('click', function() {
+    // Возвращаем исходный заголовок
+    $('#mainTitle').text('Популярные направления для отдыха');
+    
+    // Показываем категории, скрываем объявления
+    $('#categoriesContainer').show();
+    $('#listingsContainer').hide();
+});
+
+// Функция загрузки объявлений
+function loadListingsBySubcategory(subcategoryId, subcategoryName) {
+    $.ajax({
+        url: '../index.php?page=fetch_listings',
+        type: 'POST',
+        data: { subcategory_id: subcategoryId },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                displayListings(response.listings, subcategoryName);
+            } else {
+                $('#listingsContent').html('<div class="col-12"><p class="text-center">Объявления не найдены</p></div>');
+            }
+        },
+        error: function() {
+            $('#listingsContent').html('<div class="col-12"><p class="text-center">Ошибка загрузки данных</p></div>');
+        }
+    });
+}
+
+// Функция отображения объявлений
+function displayListings(listings, subcategoryName) {
+    let html = `<div class="mb-4" style="text-align: center;">
+                   <h3>Где остановиться:</h3>
+                </div>`;
+    if (listings.length === 0) {
+        html += '<p>Объявления не найдены</p>';
+    } else {
+        listings.forEach(listing => {
+            html += `
+            <div class="goods mb-4">
+                <div class="goods__image">
+                    <a title="Еще фотографии на странице" class="slide_hover" 
+                       data-photos="${listing.photos.join(',')}" 
+                       href="/listing/${listing.id}/" 
+                       style="background-image: url('${listing.main_photo}')"></a>
+                </div>
+                <div class="goods__content">
+                    <div class="goods__title">
+                        <a href="/listing/${listing.id}/">${listing.title}</a>
+                    </div>
+                    <div class="goods__content_row">
+                        <div class="goods__detail">
+                            <ul>
+                                ${listing.wifi_free ? '<li><font color="#FF0000">Wi-Fi бесплатно</font></li>' : ''}
+                                <li style="max-width: 400px;border: 1px solid rgb(198, 230, 246);background: rgb(205, 240, 246);border-radius: 4px;color: rgba(8, 15, 23, 0.78);">
+                                    <strong>До моря:</strong> <span>${listing.distance_to_sea}</span>
+                                </li>
+                                <li><strong>Адрес:</strong> <span>${listing.address}</span></li>
+                                ${listing.has_parking ? '<li class="goods__views_lg"><strong>Автостоянка:</strong> <span>на территории (бесплатно)</span></li>' : ''}
+                                <li><strong>Питание:</strong> <span>${listing.food_options}</span></li>
+                                <li><strong>Телефоны:</strong> <span>${listing.phone}</span></li>
+                            </ul>
+                            <div class="goods__views goods__views_lg">
+                                <span class="hide_xs">
+                                    <a href="/listing/${listing.id}/">Отзывы (${listing.reviews_count})</a>
+                                </span> 
+                            </div>
+                        </div>
+                        <div class="goods__info">
+                            <div class="goods__price">
+                                <div class="goods__price_title">Цены за номер:</div>
+                                <ul class="goods__price_value">
+                                    ${listing.prices.map(price => {
+    const cleanAmount = price.amount.toString().replace(/\.00$/, '');
+    return `<li class="hide_xs">${price.month}: от ${cleanAmount} руб.</li>`;
+}).join('')}
+                                </ul>
+                            </div>
+                            <div class="goods__views goods__views_sm">
+                                <span class="hide_xs">
+                                    <a href="/listing/${listing.id}/">Отзывы (${listing.reviews_count})</a>
+                                </span> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+    }
+
+    $('#listingsContent').html(html);
+}
+// Обработчик кнопки "Назад"
+$('#backToCategories').on('click', function() {
+    $('#listingsContainer').hide();
+    $('#categoriesContainer').show();
+    $('#listingsContent').empty();
+});
+
+
+   //строка поиска
     // Переменные для хранения текущего активного поля
     let activeField = null;
-    
     // Функция для позиционирования выпадающего меню
     function positionDropdown(field, dropdown) {
         const rect = field.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
         dropdown.style.position = 'absolute';
         dropdown.style.top = (rect.bottom + scrollTop + 5) + 'px';
         dropdown.style.left = '50%';
         dropdown.style.transform = 'translateX(-50%)';
     }
     
-    // Обработка выбора дат
-    $('#checkinField, #checkoutField').click(function(e) {
-        e.stopPropagation();
-        
-        // Скрыть другие выпадающие меню
-        $('#peopleDropdown').removeClass('show-dropdown');
-        
-        // Показать/скрыть календарь
-        const calendar = $('#calendarDropdown');
-        if (calendar.hasClass('show-dropdown')) {
-            calendar.removeClass('show-dropdown');
-        } else {
-            calendar.addClass('show-dropdown');
-            activeField = this;
-            positionDropdown(this, calendar[0]);
-        }
-    });
-    
     // Обработка выбора количества людей
     $('#peopleField').click(function(e) {
         e.stopPropagation();
-        
-        // Скрыть другие выпадающие меню
-        $('#calendarDropdown').removeClass('show-dropdown');
-        
         // Показать/скрыть меню выбора людей
         const people = $('#peopleDropdown');
         if (people.hasClass('show-dropdown')) {
@@ -952,15 +1251,6 @@ if (session_status() === PHP_SESSION_NONE) {
             activeField = this;
             positionDropdown(this, people[0]);
         }
-    });
-    
-    $('#applyDates').click(function() {
-        // Здесь будет логика применения выбранных дат
-        $('#checkinValue').text('01.01.2023').show();
-        $('#checkinPlaceholder').hide();
-        $('#checkoutValue').text('10.01.2023').show();
-        $('#checkoutPlaceholder').hide();
-        $('#calendarDropdown').removeClass('show-dropdown');
     });
     
     // Обработка выбора количества людей
@@ -1016,8 +1306,112 @@ if (session_status() === PHP_SESSION_NONE) {
     $('.dropdown-menu-custom').click(function(e) {
         e.stopPropagation();
     });
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем наличие flatpickr
+    if (typeof flatpickr === 'undefined') {
+        console.error('Flatpickr не загружен');
+        return;
+    }
+
+    // Инициализация календарей
+    window.checkinCalendar = null;
+    window.checkoutCalendar = null;
+    const today = new Date();
+    
+    try {
+        checkinCalendar = flatpickr("#dateFrom-input", {
+            dateFormat: "d.m.Y",
+            locale: "ru",
+            minDate: "today",
+            defaultDate: "today",
+            onChange: function(selectedDates, dateStr) {
+                updateFieldValue('checkin', dateStr);
+                
+                // Обновляем минимальную дату для checkout
+                if (selectedDates[0]) {
+                    const nextDay = new Date(selectedDates[0]);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    
+                    if (checkoutCalendar) {
+                        checkoutCalendar.set('minDate', nextDay);
+                        
+                        // Если дата выезда раньше новой минимальной даты, сбрасываем её
+                        const checkoutDate = checkoutCalendar.selectedDates[0];
+                        if (checkoutDate && checkoutDate <= selectedDates[0]) {
+                            checkoutCalendar.clear();
+                            updateFieldValue('checkout', '');
+                        }
+                    }
+                }
+            }
+        });
+        
+        checkoutCalendar = flatpickr("#dateTo-input", {
+            dateFormat: "d.m.Y",
+            locale: "ru",
+            minDate: new Date(today.getTime() + 86400000), // Завтра
+            onChange: function(selectedDates, dateStr) {
+                updateFieldValue('checkout', dateStr);
+            }
+        });
+        
+    } catch (error) {
+        console.error('Ошибка инициализации календарей:', error);
+    }
+    
+    // функция обновления значений
+    function updateFieldValue(type, value) {
+        try {
+            const valueElement = document.getElementById(`${type}Value`);
+            const placeholder = document.getElementById(`${type}Placeholder`);
+            const input = document.getElementById(`${type === 'checkin' ? 'dateFrom' : 'dateTo'}-input`);
+            
+            if (!valueElement || !placeholder || !input) {
+                throw new Error(`Элементы для ${type} не найдены`);
+            }
+            
+            if (value) {
+                valueElement.textContent = value;
+                valueElement.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                valueElement.style.display = 'none';
+                placeholder.style.display = 'block';
+                valueElement.textContent = '';
+            }
+            
+            input.value = value;
+            
+        } catch (error) {
+            console.error(`Ошибка обновления поля ${type}:`, error);
+        }
+    }
+    
+    addFieldClickHandlers();
 });
-        document.addEventListener('DOMContentLoaded', function() {
+
+// Обработчики кликов по полям
+function addFieldClickHandlers() {
+    const fields = document.querySelectorAll('.search-field');
+    
+    fields.forEach(field => {
+        field.addEventListener('click', function(e) {
+            if (!e.target.closest('input')) {
+                const input = this.querySelector('input');
+                if (input) {
+                    input.focus();
+                    // Программно открываем календарь
+                    if (input.id === 'dateFrom-input' && window.checkinCalendar) {
+                        window.checkinCalendar.open();
+                    } else if (input.id === 'dateTo-input' && window.checkoutCalendar) {
+                        window.checkoutCalendar.open();
+                    }
+                }
+            }
+        });
+    });
+}
+    document.addEventListener('DOMContentLoaded', function() {
     // Инициализация Swiper с настройками для бесконечной прокрутки
     const swiper = new Swiper('.nav__fluid_slider', {
         slidesPerView: 'auto',

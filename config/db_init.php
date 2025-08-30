@@ -3,9 +3,210 @@ include 'db.php';
 //include $_SERVER['DOCUMENT_ROOT'] . '/config/db.php';
 try { //$db = getDb();
 
+// Заполнение таблицы listings тестовыми данными
+    $users = $db->query("SELECT id FROM users LIMIT 5")->fetchAll(PDO::FETCH_COLUMN);
+    
+    if (empty($users)) {
+        // Создаем тестовых пользователей если их нет
+        $testUsers = [
+    ['testuser1@example.com', 'testuser1', 'password_hash_here', 'hotelier'],
+    ['testuser2@example.com', 'testuser2', 'password_hash_here', 'hotelier'],
+    ['testuser3@example.com', 'testuser3', 'password_hash_here', 'hotelier']
+];
 
+foreach ($testUsers as $userData) {
+    $stmt = $db->prepare("INSERT INTO users (email, username, password_hash, role) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$userData[0], $userData[1], password_hash('temp_password', PASSWORD_DEFAULT), $userData[3]]);
+}
+        
+        $users = $db->query("SELECT id FROM users LIMIT 5")->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    // Получаем ID категорий и подкатегорий
+    $categories = $db->query("SELECT id, name, parent_id FROM categories")->fetchAll(PDO::FETCH_ASSOC);
+    
+    $mainCategories = array_filter($categories, fn($cat) => $cat['parent_id'] === null);
+    $subCategories = array_filter($categories, fn($cat) => $cat['parent_id'] !== null);
+    
+    // Тестовые данные для listings
+    $testListings = [
+        [
+            'title' => 'Уютная квартира в центре Анапы',
+            'description' => 'Просторная 2-комнатная квартира с видом на море. Современный ремонт, вся необходимая техника. Рядом пляж и инфраструктура.',
+            'address' => 'г. Анапа, ул. Ленина, д. 15',
+            'distance_to_sea' => '200 м',
+            'has_parking' => true,
+            'food_options' => 'Без питания, Возможно заказать',
+            'registry_number' => 'АН-12345',
+            'legal_form' => 'individual_entrepreneur',
+            'phone' => '+7 (999) 123-45-67',
+            'max_adults' => 4,
+            'max_children' => 2,
+            'max_guests_total' => 6
+        ],
+        [
+            'title' => 'Частный дом в Джемете',
+            'description' => 'Комфортабельный дом для большой компании. Собственный двор, мангал, беседка. В 5 минутах от песчаного пляжа.',
+            'address' => 'п. Джемете, ул. Пляжная, д. 8',
+            'distance_to_sea' => '300 м',
+            'has_parking' => true,
+            'food_options' => 'Самостоятельно, Кухня оборудована',
+            'registry_number' => 'ДЖ-67890',
+            'legal_form' => 'self_employed',
+            'phone' => '+7 (999) 765-43-21',
+            'max_adults' => 8,
+            'max_children' => 4,
+            'max_guests_total' => 12
+        ],
+        [
+            'title' => 'Студия в новом комплексе Сочи',
+            'description' => 'Современная студия с панорамными окнами. Кондиционер, Wi-Fi, кухня-ниша. Идеально для молодой пары.',
+            'address' => 'г. Сочи, ул. Олимпийская, д. 25',
+            'distance_to_sea' => '500 м',
+            'has_parking' => false,
+            'food_options' => 'Без питания',
+            'registry_number' => 'СЧ-54321',
+            'legal_form' => 'legal_entity',
+            'phone' => '+7 (999) 555-44-33',
+            'max_adults' => 2,
+            'max_children' => 1,
+            'max_guests_total' => 3
+        ],
+        [
+            'title' => 'Вилла в Гагре с бассейном',
+            'description' => 'Роскошная вилла с приватным бассейном и садом. 4 спальни, просторная гостиная. Вид на горы и море.',
+            'address' => 'г. Гагра, ул. Приморская, д. 12',
+            'distance_to_sea' => '150 м',
+            'has_parking' => true,
+            'food_options' => 'Завтрак включен, Полный пансион',
+            'registry_number' => 'АБ-98765',
+            'legal_form' => 'individual_entrepreneur',
+            'phone' => '+7 (999) 222-33-44',
+            'max_adults' => 10,
+            'max_children' => 6,
+            'max_guests_total' => 16
+        ],
+        [
+            'title' => 'Эконом вариант в Крыму',
+            'description' => 'Небольшая комната в частном секторе. Все необходимое для бюджетного отдыха. Рядом магазины и остановка.',
+            'address' => 'г. Евпатория, ул. Садовая, д. 7',
+            'distance_to_sea' => '800 м',
+            'has_parking' => false,
+            'food_options' => 'Самостоятельно',
+            'registry_number' => 'КР-11223',
+            'legal_form' => 'self_employed',
+            'phone' => '+7 (999) 777-88-99',
+            'max_adults' => 2,
+            'max_children' => 0,
+            'max_guests_total' => 2
+        ]
+    ];
+
+    // Вставляем тестовые объявления
+    $listingIds = [];
+    foreach ($testListings as $index => $listingData) {
+        $userIndex = $index % count($users);
+        $categoryIndex = $index % count($mainCategories);
+        
+        $mainCategory = array_values($mainCategories)[$categoryIndex];
+        $subCategoriesForMain = array_filter($subCategories, fn($sub) => $sub['parent_id'] == $mainCategory['id']);
+        
+        $subCategory = !empty($subCategoriesForMain) ? array_values($subCategoriesForMain)[0] : null;
+        
+        $stmt = $db->prepare("INSERT INTO listings 
+            (user_id, category_id, subcategory_id, title, description, address, 
+             distance_to_sea, has_parking, food_options, registry_number, 
+             legal_form, phone, max_adults, max_children, max_guests_total, is_approved, created_at) 
+            VALUES 
+            (:user_id, :category_id, :subcategory_id, :title, :description, :address,
+             :distance_to_sea, :has_parking, :food_options, :registry_number,
+             :legal_form, :phone, :max_adults, :max_children, :max_guests_total, :is_approved, NOW())");
+        
+        $stmt->execute([
+            ':user_id' => $users[$userIndex],
+            ':category_id' => $mainCategory['id'],
+            ':subcategory_id' => $subCategory ? $subCategory['id'] : null,
+            ':title' => $listingData['title'],
+            ':description' => $listingData['description'],
+            ':address' => $listingData['address'],
+            ':distance_to_sea' => $listingData['distance_to_sea'],
+            ':has_parking' => (int)$listingData['has_parking'],
+            ':food_options' => $listingData['food_options'],
+            ':registry_number' => $listingData['registry_number'],
+            ':legal_form' => $listingData['legal_form'],
+            ':phone' => $listingData['phone'],
+            ':max_adults' => $listingData['max_adults'],
+            ':max_children' => $listingData['max_children'],
+            ':max_guests_total' => $listingData['max_guests_total'],
+            ':is_approved' => 1 // Одобряем для тестов
+        ]);
+        
+        // Сохраняем ID созданного объявления
+        $listingIds[] = $db->lastInsertId();
+    }
+
+    // Заполнение таблицы listing_prices тестовыми данными
+    $months = ['май', 'июнь', 'июль', 'август', 'сентябрь'];
+    
+    foreach ($listingIds as $listingId) {
+        // Генерируем базовую цену для этого объявления (от 1000 до 5000)
+        $basePrice = rand(1000, 5000);
+        
+        foreach ($months as $month) {
+            // Добавляем сезонный коэффициент к цене
+            $seasonCoefficient = [
+                'май' => 0.8,
+                'июнь' => 1.0,
+                'июль' => 1.5,
+                'август' => 1.8,
+                'сентябрь' => 0.9
+            ];
+            
+            $price = $basePrice * $seasonCoefficient[$month];
+            
+            // Округляем до сотен
+            $price = round($price / 100) * 100;
+            
+            $stmt = $db->prepare("INSERT INTO listing_prices (listing_id, month, amount) VALUES (?, ?, ?)");
+            $stmt->execute([$listingId, $month, $price]);
+        }
+    }
+    echo "База данных успешно заполнена категориями курортов и тестовыми объявлениями!";
+if (!empty($listingIds)) {
+        $reasons = ['booked', 'maintenance', 'other'];
+        
+        foreach ($listingIds as $listingId) {
+            // Создаем несколько заблокированных дат для каждого объявления
+            $blockedDatesCount = rand(3, 8); // От 3 до 8 заблокированных дат на объявление
+            
+            for ($i = 0; $i < $blockedDatesCount; $i++) {
+                // Генерируем случайную дату в пределах 2024 года
+                $randomMonth = rand(5, 9); // май-сентябрь
+                $randomDay = rand(1, 28); // избегаем проблем с разным количеством дней в месяцах
+                $date = sprintf('2024-%02d-%02d', $randomMonth, $randomDay);
+                
+                // Случайная причина блокировки
+                $reason = $reasons[array_rand($reasons)];
+                
+                try {
+                    $stmt = $db->prepare("INSERT INTO blocked_dates (listing_id, date, reason) VALUES (?, ?, ?)");
+                    $stmt->execute([$listingId, $date, $reason]);
+                } catch (PDOException $e) {
+                    // Игнорируем ошибки дубликатов (UNIQUE constraint)
+                    if ($e->getCode() != 23000) { // SQLite код для constraint violation
+                        throw $e;
+                    }
+                }
+            }
+        }
+        
+        echo " Таблица blocked_dates также успешно заполнена!";
+    }
+} catch (PDOException $e) { 
+    echo "Ошибка: " . $e->getMessage(); 
+}
 // Данные из HTML для основной таблицы categories
-$categoriesData = [
+/*$categoriesData = [
     [
         'name' => 'Анапа',
         'url' => '/anapa/',
@@ -282,7 +483,7 @@ $categoryId = $db->lastInsertId(); $mainCategoryIds[$categoryData['name']] = $ca
 }
 
 echo "База данных успешно заполнена категориями курортов!";
-} catch (PDOException $e) { echo "Ошибка: " . $e->getMessage(); }
+} catch (PDOException $e) { echo "Ошибка: " . $e->getMessage(); }*/
 
     // Добавление пользователей
     /*$users = [

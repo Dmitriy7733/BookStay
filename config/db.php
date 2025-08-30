@@ -31,16 +31,16 @@ function getDb() : PDO|null {
             $db->exec("SET FOREIGN_KEY_CHECKS = 1");
             
             // Сообщение об успешном подключении
-            echo "<div style='background-color: #d4edda; color: #155724; padding: 10px; margin: 10px; border: 1px solid # #c3e6cb; border-radius: 4px;'>
+            /*echo "<div style='background-color: #d4edda; color: #155724; padding: 10px; margin: 10px; border: 1px solid # #c3e6cb; border-radius: 4px;'>
                     ✅ Успешное подключение к базе данных!
-                  </div>";
+                  </div>";*/
             
         } catch (PDOException $e) {
             // Обработка ошибок подключения
             error_log("Database connection failed: " . $e->getMessage());
-            echo "<div style='background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border: 1px solid #f5c6cb; border-radius: 4px;'>
+            /*echo "<div style='background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border: 1px solid #f5c6cb; border-radius: 4px;'>
                     ❌ Ошибка подключения к базе данных: " . htmlspecialchars($e->getMessage()) . "
-                  </div>";
+                  </div>";*/
             return null;
         }
     }

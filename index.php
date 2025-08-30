@@ -4,8 +4,9 @@ session_start();
 
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/app/controllers/CategoryController.php';
-require_once __DIR__ . '/app/controllers/SearchAjaxController.php';
+require_once __DIR__ . '/app/controllers/SearchController.php';
 require_once __DIR__ . '/app/controllers/HomeController.php';
+require_once __DIR__ . '/app/controllers/ListingController.php';
 require_once __DIR__ . '/app/controllers/UploadController.php';
 require_once __DIR__ . '/app/controllers/ComplaintController.php';
 require_once __DIR__ . '/app/controllers/AdminController.php';
@@ -25,14 +26,18 @@ $is_blocked = isset($_SESSION['is_blocked']) && $_SESSION['is_blocked']; // Пр
 $page = $_GET['page'] ?? 'home';
 
 switch ($page) {
-    case 'search_instructions':
-        $ajaxController = new SearchAjaxController($db);
-        $ajaxController->search(); 
+    case 'fetch_listings':
+    $ListingController = new ListingController($db);
+    $ListingController->fetchListingsBySubcategory();
+    break;
+    case 'search':
+        $searchController = new SearchController($db);
+        $searchController->search(); 
         break;
-    case 'fetch_instructions':
-        $ajaxController = new SearchAjaxController($db);
-        $ajaxController->fetchInstructions(); 
-        break; 
+    case 'autocomplete_cities':
+    $searchController = new SearchController($db);
+    $searchController->autocompleteCities();
+    break;
     case 'get_parent_categories':
         $categoryController = new CategoryController($db);
         $categoryController->getParentCategories();
