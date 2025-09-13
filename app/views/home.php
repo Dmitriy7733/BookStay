@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="robots" content="noindex, nofollow">
-    <title>Инструкции для техники</title>
+    <title>Курортик</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -886,7 +886,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <li class="nav-item"><a class="nav-link" href="?page=logout">Выход</a></li>
                 <li class="nav-item"><a class="nav-link" href="?page=register">Регистрация</a></li>
                 <li class="nav-item"><a class="nav-link" href="?page=login">Вход</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить инструкцию</a></li>
+                <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
             </ul>
         </div>
     </div>
@@ -953,15 +953,15 @@ if (session_status() === PHP_SESSION_NONE) {
         <form class="search-form" id="searchMainForm">
             <div class="search-row">
                 <!-- Поле для поиска города/направления -->
-                <div class="search-field" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="destinationField">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div class="field-text">
-                        <span class="placeholder" id="destinationPlaceholder">Куда вы хотите поехать?</span>
-                        <span class="selected-value" id="destinationValue" style="display:none"></span>
-                    </div>
-                    <input type="hidden" id="city-input" name="city">
-                    <input type="hidden" id="city-id-input" name="cityId">
-                </div>
+                <div class="search-field">
+    <i class="fas fa-map-marker-alt"></i>
+    <div class="field-text">
+        <input type="text" id="city-input" name="city" 
+               placeholder="Введите направление (например, Ялта)"
+               class="city-autocomplete-input">
+        <input type="hidden" id="city-id-input" name="cityId">
+    </div>
+</div>
                 
                 <!-- Поле для выбора даты заезда -->
 <div class="search-field date-field" id="checkinField">
@@ -1065,24 +1065,30 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
     
     <!-- Контейнер для объявлений с кнопкой возврата -->
-    <div id="listingsContainer" class="row listings-container" style="display: none;">
-        <!-- Кнопка возврата к категориям -->
-        <div class="col-12 mb-4">
-            <button id="backToCategories" class="btn btn-secondary back-to-categories">
-                <i class="fas fa-arrow-left"></i> Назад к категориям
-            </button>
-        </div>
-        <!-- Здесь будут появляться объявления -->
-        <div id="listingsContent" class="col-12"></div>
+<div id="listingsContainer" class="row listings-container" style="display: none;">
+    <!-- Кнопка возврата к категориям -->
+    <div class="col-12 mb-4">
+        <button id="backToCategories" class="btn btn-secondary back-to-categories">
+            <i class="fas fa-arrow-left"></i> Назад к категориям
+        </button>
     </div>
+    
+    <!-- Заголовок для подкатегорий -->
+    <div id="subcategoryTitle" class="col-12 mb-4" style="display: none; text-align: center;">
+        <h3>Где остановиться:</h3>
+    </div>
+    
     <!-- Заголовок для результатов поиска -->
-        <div id="searchResultsTitle" class="col-12 mb-4" style="display: none; text-align: center;">
-            <h3>Результаты поиска</h3>
-        </div>
-        <!-- Здесь будут появляться объявления -->
-        <div id="listingsContent" class="col-12"></div>
-        <!-- Пагинация для результатов поиска -->
-        <div id="searchPagination" class="col-12 mt-4" style="display: none;"></div>
+    <div id="searchResultsTitle" class="col-12 mb-4" style="display: none; text-align: center;">
+        <h3>Результаты поиска</h3>
+    </div>
+    
+    <!-- Здесь будут появляться объявления -->
+    <div id="listingsContent" class="col-12"></div>
+    
+    <!-- Пагинация для результатов поиска -->
+    <div id="searchPagination" class="col-12 mt-4" style="display: none;"></div>
+    </div>
 </div>
 
 </main>
@@ -1090,7 +1096,7 @@ if (session_status() === PHP_SESSION_NONE) {
     
 <footer class="bg-secondary text-black text-center py-2">
     <div class="container">
-        <p class="mb-0">&copy; 2025 Инструкции для техники. Дмитрий Попов.</p>
+        <p class="mb-0">&copy; 2025 Отдых на курортах России без посредников. Дмитрий Попов.</p>
     </div>
 </footer>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -1102,12 +1108,162 @@ if (session_status() === PHP_SESSION_NONE) {
 <script src="../assets/download.js"></script>
 <script src="../assets/correct.js"></script>
     <script>
+// Обработчик отправки формы поиска
+$('#searchMainForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        cityId: $('#city-id-input').val(),
+        dateFrom: $('#dateFrom-input').val(),
+        dateTo: $('#dateTo-input').val(),
+        adult: $('#adult-input').val(),
+        child: $('#child-input').val()
+    };
+    
+    // Выполняем поиск
+    performSearch(formData);
+});
+// Функция выполнения поиска
+function performSearch(searchParams) {
+    // Валидация обязательных полей
+    if (!searchParams.cityId) {
+        alert('Пожалуйста, выберите направление');
+        return;
+    }
+    
+    $.ajax({
+        url: '../index.php?page=search',
+        type: 'POST',
+        data: searchParams,
+        dataType: 'json',
+        success: function(response) {
+            if (response.success && response.listings) {
+                displaySearchResults(response.listings, response.searchParams, response.pagination);
+            } else {
+                alert(response.message || 'Объявления не найдены');
+                $('#listingsContent').html('<div class="col-12"><p class="text-center">Объявления не найдены</p></div>');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', status, error);
+            alert('Ошибка соединения с сервером');
+            $('#listingsContent').html('<div class="col-12"><p class="text-center">Ошибка загрузки данных</p></div>');
+        }
+    });
+}
+
+// Функция отображения результатов поиска
+function displaySearchResults(listings, searchParams, pagination) {
+    // Скрываем категории и показываем контейнер объявлений
+    $('#categoriesContainer').hide();
+    $('#listingsContainer').show();
+    
+    // Показываем заголовок поиска, скрываем заголовок подкатегорий
+    $('#searchResultsTitle').show();
+    $('#subcategoryTitle').hide();
+    
+    // Обновляем основной заголовок
+    const cityName = searchParams.cityName;
+    const correctForm = getCorrectPrepositionForm(cityName);
+    $('#mainTitle').text(`Результаты поиска: отдых в ${correctForm}`);
+    
+    // Отображаем объявления
+    displayListings(listings, cityName);
+    
+    // Отображаем пагинацию, если есть
+    if (pagination && pagination.totalPages > 1) {
+        displayPagination(pagination);
+    } else {
+        $('#searchPagination').hide();
+    }
+}
+
+// Инициализация при загрузке
+$(document).ready(function() {
+    setupCityAutocomplete();
+    
+    // Закрываем все подменю при загрузке
+    $('.ul_second_nav').hide();
+});
+
+// Функция для автозаполнения направления (без выпадающего меню)
+function setupCityAutocomplete() {
+    $('#city-input').on('input', function() {
+        const query = $(this).val().trim();
+        if (query.length > 2) {
+            $.ajax({
+                url: '../index.php?page=autocomplete_cities',
+                type: 'POST',
+                data: { query: query },
+                dataType: 'json',
+                success: function(cities) {
+                    if (cities && cities.length > 0) {
+                        $('#city-id-input').val(cities[0].id);
+                    } else {
+                        $('#city-id-input').val('');
+                    }
+                },
+                error: function() {
+                    $('#city-id-input').val('');
+                }
+            });
+        } else {
+            $('#city-id-input').val('');
+        }
+    });
+}
 
 
+// Инициализация при загрузке
+$(document).ready(function() {
+    setupCityAutocomplete();
+});
 
 
-// Обработчик клика по подкатегории
-$(document).on('click', '.subcategory-link', function(e) {
+/*оооооооооооооооооооооооооооооооооооооооооооооооооооооо*/
+// Функция отображения объявлений для подкатегорий
+function displaySubcategoryListings(listings, subcategoryName) {
+    // Скрываем категории и показываем контейнер объявлений
+    $('#categoriesContainer').hide();
+    $('#listingsContainer').show();
+    
+    // Показываем заголовок подкатегорий, скрываем заголовок поиска
+    $('#subcategoryTitle').show();
+    $('#searchResultsTitle').hide();
+    $('#searchPagination').hide();
+    
+    // Обновляем основной заголовок
+    const correctForm = getCorrectPrepositionForm(subcategoryName);
+    $('#mainTitle').text(`Отдых в ${correctForm}`);
+    
+    // Отображаем объявления
+    displayListings(listings, subcategoryName);
+}
+// Обработчик клика по подкатегории в навигационном меню
+$(document).on('click', '.nav .subcategory-link', function(e) {
+    e.preventDefault();
+    e.stopPropagation(); // Важно: останавливаем всплытие
+    
+    const subcategoryId = $(this).data('subcategory-id');
+    const subcategoryName = $(this).data('subcategory-name');
+    
+    // Закрываем все открытые подменю
+    $('.ul_second_nav').hide();
+    
+    // Меняем заголовок
+    const correctForm = getCorrectPrepositionForm(subcategoryName);
+    $('#mainTitle').text(`Отдых в ${correctForm}`);
+    
+    // Показываем контейнер с объявлениями, скрываем категории
+    $('#categoriesContainer').hide();
+    $('#listingsContainer').show();
+    $('#searchResultsTitle').hide();
+    
+    // Загружаем объявления для выбранной подкатегории
+    loadListingsBySubcategory(subcategoryId, subcategoryName);
+});
+// Обработчик клика по подкатегории в карточках
+$(document).on('click', '.card .subcategory-link', function(e) {
     e.preventDefault();
     
     const subcategoryId = $(this).data('subcategory-id');
@@ -1120,6 +1276,7 @@ $(document).on('click', '.subcategory-link', function(e) {
     // Показываем контейнер с объявлениями, скрываем категории
     $('#categoriesContainer').hide();
     $('#listingsContainer').show();
+    $('#searchResultsTitle').hide(); // Скрываем заголовок поиска
     
     // Загружаем объявления для выбранной подкатегории
     loadListingsBySubcategory(subcategoryId, subcategoryName);
@@ -1130,9 +1287,10 @@ $('#backToCategories').on('click', function() {
     // Возвращаем исходный заголовок
     $('#mainTitle').text('Популярные направления для отдыха');
     
-    // Показываем категории, скрываем объявления
+    // Показываем категории, скрываем объявления и результаты поиска
     $('#categoriesContainer').show();
     $('#listingsContainer').hide();
+    $('#searchResultsTitle').hide();
 });
 
 // Функция загрузки объявлений
@@ -1141,10 +1299,10 @@ function loadListingsBySubcategory(subcategoryId, subcategoryName) {
         url: '../index.php?page=fetch_listings',
         type: 'POST',
         data: { subcategory_id: subcategoryId },
-        dataType: 'json',
+               dataType: 'json',
         success: function(response) {
             if (response.success) {
-                displayListings(response.listings, subcategoryName);
+                displaySubcategoryListings(response.listings, subcategoryName);
             } else {
                 $('#listingsContent').html('<div class="col-12"><p class="text-center">Объявления не найдены</p></div>');
             }
@@ -1154,14 +1312,60 @@ function loadListingsBySubcategory(subcategoryId, subcategoryName) {
         }
     });
 }
+// Функция отображения пагинации
+function displayPagination(pagination) {
+    let html = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+    
+    // Кнопка "Назад"
+    if (pagination.currentPage > 1) {
+        html += `<li class="page-item">
+                    <a class="page-link" href="#" data-page="${pagination.currentPage - 1}">Назад</a>
+                 </li>`;
+    }
+    
+    // Номера страниц
+    for (let i = 1; i <= pagination.totalPages; i++) {
+        html += `<li class="page-item ${i === pagination.currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                 </li>`;
+    }
+    
+    // Кнопка "Вперед"
+    if (pagination.currentPage < pagination.totalPages) {
+        html += `<li class="page-item">
+                    <a class="page-link" href="#" data-page="${pagination.currentPage + 1}">Вперед</a>
+                 </li>`;
+    }
+    
+    html += '</ul></nav>';
+    $('#searchPagination').html(html).show();
+}
 
-// Функция отображения объявлений
-function displayListings(listings, subcategoryName) {
-    let html = `<div class="mb-4" style="text-align: center;">
-                   <h3>Где остановиться:</h3>
-                </div>`;
+// Обработчик клика по пагинации
+$(document).on('click', '#searchPagination .page-link', function(e) {
+    e.preventDefault();
+    const page = $(this).data('page');
+    
+    // Получаем текущие параметры поиска
+    const searchParams = {
+        cityId: $('#city-id-input').val(),
+        dateFrom: $('#dateFrom-input').val(),
+        dateTo: $('#dateTo-input').val(),
+        adult: $('#adult-input').val(),
+        child: $('#child-input').val(),
+        page: page
+    };
+    
+    // Выполняем поиск с новой страницей
+    performSearch(searchParams);
+});
+
+// Универсальная функция отображения объявлений
+function displayListings(listings, title) {
+    let html = '';
+    
     if (listings.length === 0) {
-        html += '<p>Объявления не найдены</p>';
+        html = '<div class="col-12"><p class="text-center">Объявления не найдены</p></div>';
     } else {
         listings.forEach(listing => {
             html += `
@@ -1199,9 +1403,9 @@ function displayListings(listings, subcategoryName) {
                                 <div class="goods__price_title">Цены за номер:</div>
                                 <ul class="goods__price_value">
                                     ${listing.prices.map(price => {
-    const cleanAmount = price.amount.toString().replace(/\.00$/, '');
-    return `<li class="hide_xs">${price.month}: от ${cleanAmount} руб.</li>`;
-}).join('')}
+                                        const cleanAmount = price.amount.toString().replace(/\.00$/, '');
+                                        return `<li class="hide_xs">${price.month}: от ${cleanAmount} руб.</li>`;
+                                    }).join('')}
                                 </ul>
                             </div>
                             <div class="goods__views goods__views_sm">
@@ -1218,10 +1422,20 @@ function displayListings(listings, subcategoryName) {
 
     $('#listingsContent').html(html);
 }
-// Обработчик кнопки "Назад"
+
+// Обработчик кнопки "Назад к категориям"
 $('#backToCategories').on('click', function() {
-    $('#listingsContainer').hide();
+    // Возвращаем исходный заголовок
+    $('#mainTitle').text('Популярные направления для отдыха');
+    
+    // Показываем категории, скрываем всё остальное
     $('#categoriesContainer').show();
+    $('#listingsContainer').hide();
+    $('#searchResultsTitle').hide();
+    $('#subcategoryTitle').hide();
+    $('#searchPagination').hide();
+    
+    // Очищаем контент
     $('#listingsContent').empty();
 });
 
@@ -1514,7 +1728,7 @@ function addFieldClickHandlers() {
                             }
                         });
                         
-                        if (subsubmenu.classList.contains('mobile-submenu-open')) {
+                        if (submenu.classList.contains('mobile-submenu-open')) {
                             submenu.classList.remove('mobile-submenu-open');
                             // Возобновляем автопрокруттку при закрытии подменю
                             swiper.autoplay.start();

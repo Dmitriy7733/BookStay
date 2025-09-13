@@ -1,23 +1,42 @@
-<!-- app/views/auth/login.php -->
-
+<!-- app/views/hotelier_bookings.php -->
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// Защита страницы
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ?page=login');
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+$listing_id = $_GET['listing_id'] ?? null;
+
+// Получаем все объявления пользователя для выпадающего списка
+$userListings = getUserListings($user_id, 'published');
+
+// Если выбрано конкретное объявление, получаем его бронирования
+$bookings = [];
+$selectedListing = null;
+
+if ($listing_id) {
+    // Проверяем, что объявление принадлежит пользователю
+    $selectedListing = getListingByIdForUser($listing_id, $user_id);
+    if ($selectedListing) {
+        $bookings = getBookingsForListing($listing_id);
+    }
 }
 ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Курортик</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <title>Управление бронированиями - Курортик</title>
+    
+    <!-- Подключение FullCalendar -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    
+    
     <style>
+
       * {
             margin: 0;
             padding: 0;
@@ -803,7 +822,43 @@ if (session_status() === PHP_SESSION_NONE) {
         margin-top: 10px;
     }
 }
+.carousel-control-prev, .carousel-control-next {
+    width: 5%;
+}
 
+.carousel-item img {
+    border-radius: 5px;
+    height: 200px;
+    object-fit: cover;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
+
+.goods__image {
+    position: relative;
+}
+
+.goods__image .carousel {
+    height: 200px;
+}
+
+.goods__image .carousel-item {
+    height: 200px;
+}
 /* Стили для заголовков и контейнеров */
 .mb-4 {
     margin-bottom: 1.5rem !important;
@@ -864,62 +919,249 @@ if (session_status() === PHP_SESSION_NONE) {
 #backToCategories:hover {
     background: #2980b9;
 }
-    
+#previewCarousel {
+    height: 200px;
+    position: relative;
+}
+
+#previewCarousel .carousel-inner {
+    height: 100%;
+    border-radius: 5px;
+}
+
+#previewCarousel .carousel-item {
+    height: 100%;
+}
+
+#previewCarousel .carousel-item img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Убедимся, что стрелки видны */
+#previewCarousel .carousel-control-prev,
+#previewCarousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+#previewCarousel .carousel-control-prev:hover,
+#previewCarousel .carousel-control-next:hover {
+    opacity: 1;
+}
+
+#previewCarousel .carousel-control-prev {
+    left: 10px;
+}
+
+#previewCarousel .carousel-control-next {
+    right: 10px;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
     </style>
 </head>
 <body>
-    <!-- Навигационная панель -->
-<div class="container">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="/app/includes/free-icon-appliances.png" alt="Логотип" style="height: 40px; margin-right: 10px;">
-            Курортик
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="?page=home">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=home#about">О сайте</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=logout">Выход</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=register">Регистрация</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=login">Вход</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
-            </ul>
+
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item"><a class="nav-link" href="?page=home">Главная</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=home#about">О сайте</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=hotelier_dashboard">Личный кабинет</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=hotelier_bookings">Управление бронированиями</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=logout">Выход (<?= htmlspecialchars($_SESSION['username']) ?>)</a></li>
+</ul>
+
+<main class="container mt-4">
+    <h2>Управление бронированиями</h2>
+    
+    <!-- Выбор объявления -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row align-items-end">
+                <input type="hidden" name="page" value="hotelier_bookings">
+                
+                <div class="col-md-8">
+                    <label for="listingSelect" class="form-label">Выберите объект для управления бронированиями:</label>
+                    <select class="form-select" id="listingSelect" name="listing_id" onchange="this.form.submit()">
+                        <option value="">-- Выберите объект --</option>
+                        <?php foreach ($userListings as $listing): ?>
+                            <option value="<?= $listing['id'] ?>" 
+                                <?= ($listing_id == $listing['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($listing['title']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Показать</button>
+                    <?php if ($listing_id): ?>
+                        <a href="?page=hotelier_bookings" class="btn btn-secondary">Сбросить</a>
+                    <?php endif; ?>
+                </div>
+            </form>
         </div>
     </div>
-</nav>
-</div>
-<div class="login-container">
-    <h1 class="text-center">Вход в систему</h1>
-    <?php
-    if (isset($_SESSION['error'])) {
-        echo "<p style='color:red;'>" . htmlspecialchars($_SESSION['error']) . "</p>";
-        unset($_SESSION['error']); // Удаляем ошибку после отображения
-    }
-    
-    if (isset($_SESSION['success'])) {
-        echo "<div class='success'>{$_SESSION['success']}</div>";
-        unset($_SESSION['success']); // Удаляем сообщение после отображения
-    }
 
-    ?>
-    <form action="" method="post">
-        <div class="form-group">
-            <label for="username">Имя пользователя:</label>
-            <input type="text" name="username" id="username" class="form-control" required autocomplete="username">
+    <?php if ($selectedListing): ?>
+        <!-- Календарь бронирований -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Календарь бронирований: <?= htmlspecialchars($selectedListing['title']) ?></h4>
+            </div>
+            <div class="card-body">
+                <div id="calendar"></div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="password">Пароль:</label>
-            <input type="password" name="password" id="password" class="form-control" required autocomplete="current-password">
+
+        <!-- Список бронирований -->
+        <div class="card">
+            <div class="card-header">
+                <h4>Список бронирований</h4>
+            </div>
+            <div class="card-body">
+                <?php if (empty($bookings)): ?>
+                    <p class="text-muted">Бронирований нет.</p>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Дата заезда</th>
+                                    <th>Дата выезда</th>
+                                    <th>Ночей</th>
+                                    <th>Дата создания</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($bookings as $booking): 
+                                    $nights = (strtotime($booking['check_out']) - strtotime($booking['check_in'])) / (60 * 60 * 24);
+                                ?>
+                                <tr>
+                                    <td>#<?= $booking['id'] ?></td>
+                                    <td><?= date('d.m.Y', strtotime($booking['check_in'])) ?></td>
+                                    <td><?= date('d.m.Y', strtotime($booking['check_out'])) ?></td>
+                                    <td><?= $nights ?></td>
+                                    <td><?= date('d.m.Y H:i', strtotime($booking['created_at'])) ?></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-danger btn-sm delete-booking" 
+                                                    data-booking-id="<?= $booking['id'] ?>" title="Удалить">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Войти</button>
-    </form>
-    <p class="text-center mt-4">
-        <a href="?page=change_password">Сменить пароль</a>
-    </p>
-</div>
+
+        
+</main>
+
+<footer class="bg-secondary text-black text-center py-2">
+    <div class="container">
+        <p class="mb-0">&copy; 2025 Отдых на курортах России без посредников. Дмитрий Попов.</p>
+    </div>
+</footer>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ru.js'></script>
+        <!-- JavaScript для календаря -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ru',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+                    <?php foreach ($bookings as $booking): 
+                    $nights = (strtotime($booking['check_out']) - strtotime($booking['check_in'])) / (60 * 60 * 24);
+                    ?>
+                    {
+                        title: 'Бронь #<?= $booking['id'] ?> (<?= $nights ?> ночей)',
+                        start: '<?= $booking['check_in'] ?>',
+                        end: '<?= date('Y-m-d', strtotime($booking['check_out'] . ' +1 day')) ?>',
+                        color: '#28a745',
+                        extendedProps: {
+                            bookingId: <?= $booking['id'] ?>
+                        }
+                    },
+                    <?php endforeach; ?>
+                ],
+                eventClick: function(info) {
+                    // Показываем детали бронирования при клике
+                    alert('Бронь #' + info.event.extendedProps.bookingId + 
+                          '\nЗаезд: ' + info.event.start.toLocaleDateString() +
+                          '\nВыезд: ' + info.event.end.toLocaleDateString());
+                }
+            });
+            calendar.render();
+            
+            // Обработка удаления бронирования
+            document.querySelectorAll('.delete-booking').forEach(button => {
+                button.addEventListener('click', function() {
+                    const bookingId = this.getAttribute('data-booking-id');
+                    if (confirm('Вы уверены, что хотите удалить это бронирование?')) {
+                        fetch('?page=delete_booking', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'booking_id=' + bookingId + '&listing_id=<?= $listing_id ?>'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Бронирование удалено');
+                                location.reload();
+                            } else {
+                                alert('Ошибка при удалении: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            alert('Ошибка сети');
+                        });
+                    }
+                });
+            });
+        });
+        </script>
+
+    <?php elseif ($listing_id && !$selectedListing): ?>
+        <div class="alert alert-danger">Объект не найден или у вас нет прав доступа.</div>
+    <?php endif; ?>
 </body>
-<?php include 'app/includes/footer.php'; ?>
+</html>

@@ -1,9 +1,17 @@
-<!-- app/views/auth/login.php -->
-
+<!-- app/views/hotelier_listings.php -->
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// Защита страницы
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ?page=login');
+    exit();
 }
+
+$user_id = $_SESSION['user_id'];
+$status = $_GET['status'] ?? 'all'; // all, published, moderation, rejected
+
+// Функция для получения объявлений пользователя по статусу
+$userListings = getUserListings($user_id, $status);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -11,13 +19,15 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="robots" content="noindex, nofollow">
-    <title>Курортик</title>
+    <title>Личный кабинет - Курортик</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    
     <style>
+
       * {
             margin: 0;
             padding: 0;
@@ -803,7 +813,43 @@ if (session_status() === PHP_SESSION_NONE) {
         margin-top: 10px;
     }
 }
+.carousel-control-prev, .carousel-control-next {
+    width: 5%;
+}
 
+.carousel-item img {
+    border-radius: 5px;
+    height: 200px;
+    object-fit: cover;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
+
+.goods__image {
+    position: relative;
+}
+
+.goods__image .carousel {
+    height: 200px;
+}
+
+.goods__image .carousel-item {
+    height: 200px;
+}
 /* Стили для заголовков и контейнеров */
 .mb-4 {
     margin-bottom: 1.5rem !important;
@@ -864,62 +910,195 @@ if (session_status() === PHP_SESSION_NONE) {
 #backToCategories:hover {
     background: #2980b9;
 }
-    
+#previewCarousel {
+    height: 200px;
+    position: relative;
+}
+
+#previewCarousel .carousel-inner {
+    height: 100%;
+    border-radius: 5px;
+}
+
+#previewCarousel .carousel-item {
+    height: 100%;
+}
+
+#previewCarousel .carousel-item img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Убедимся, что стрелки видны */
+#previewCarousel .carousel-control-prev,
+#previewCarousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+#previewCarousel .carousel-control-prev:hover,
+#previewCarousel .carousel-control-next:hover {
+    opacity: 1;
+}
+
+#previewCarousel .carousel-control-prev {
+    left: 10px;
+}
+
+#previewCarousel .carousel-control-next {
+    right: 10px;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
     </style>
 </head>
 <body>
-    <!-- Навигационная панель -->
-<div class="container">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="/app/includes/free-icon-appliances.png" alt="Логотип" style="height: 40px; margin-right: 10px;">
-            Курортик
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="?page=home">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=home#about">О сайте</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=logout">Выход</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=register">Регистрация</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=login">Вход</a></li>
-                <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
-</div>
-<div class="login-container">
-    <h1 class="text-center">Вход в систему</h1>
-    <?php
-    if (isset($_SESSION['error'])) {
-        echo "<p style='color:red;'>" . htmlspecialchars($_SESSION['error']) . "</p>";
-        unset($_SESSION['error']); // Удаляем ошибку после отображения
-    }
-    
-    if (isset($_SESSION['success'])) {
-        echo "<div class='success'>{$_SESSION['success']}</div>";
-        unset($_SESSION['success']); // Удаляем сообщение после отображения
-    }
 
-    ?>
-    <form action="" method="post">
-        <div class="form-group">
-            <label for="username">Имя пользователя:</label>
-            <input type="text" name="username" id="username" class="form-control" required autocomplete="username">
-        </div>
-        <div class="form-group">
-            <label for="password">Пароль:</label>
-            <input type="password" name="password" id="password" class="form-control" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Войти</button>
-    </form>
-    <p class="text-center mt-4">
-        <a href="?page=change_password">Сменить пароль</a>
-    </p>
-</div>
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item"><a class="nav-link" href="?page=home">Главная</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=home#about">О сайте</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=hotelier_dashboard">Личный кабинет</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=logout">Выход (<?= htmlspecialchars($_SESSION['username']) ?>)</a></li>
+</ul>
+
+<main class="container mt-4">
+    <h2>Мои объявления
+        <small class="text-muted">
+            <?php
+            switch($status) {
+                case 'published': echo 'Опубликованные'; break;
+                case 'moderation': echo 'На модерации'; break;
+                case 'rejected': echo 'Отклоненные'; break;
+                default: echo 'Все';
+            }
+            ?>
+        </small>
+    </h2>
+
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+    <?php endif; ?>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Фото</th>
+                    <th>Название</th>
+                    <th>Категория</th>
+                    <th>Статус</th>
+                    <th>Цена (от)</th>
+                    <th>Дата создания</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($userListings)): ?>
+                    <tr>
+                        <td colspan="8" class="text-center">Нет объявлений.</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach ($userListings as $listing): ?>
+                    <tr>
+                        <td><?= $listing['id'] ?></td>
+                        <td>
+                            <?php if (!empty($listing['main_photo_url'])): ?>
+                                <img src="<?= htmlspecialchars($listing['main_photo_url']) ?>" alt="Фото" style="width: 50px; height: 50px; object-fit: cover;">
+                            <?php else: ?>
+                                <i class="fas fa fa-image fa-2x text-muted"></i>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= htmlspecialchars($listing['title']) ?></td>
+                        <td><?= htmlspecialchars($listing['category_name']) ?></td>
+                        <td>
+                            <?php
+                            $statusBadge = [
+                                'published' => 'success',
+                                'moderation' => 'warning',
+                                'rejected' => 'danger'
+                            ];
+                            $statusText = [
+                                'published' => 'Опубликовано',
+                                'moderation' => 'На модерации',
+                                'rejected' => 'Отклонено'
+                            ];
+                            ?>
+                            <span class="badge badge-<?= $statusBadge[$listing['status']] ?>">
+                                <?= $statusText[$listing['status']] ?>
+                            </span>
+                            <?php if ($listing['status'] == 'rejected' && !empty($listing['moderator_comment'])): ?>
+                                <br><small data-toggle="tooltip" title="<?= htmlspecialchars($listing['moderator_comment']) ?>">Причина</small>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php
+                            // Найдем минимальную цену из 12 месяцев
+                            $prices = json_decode($listing['prices_json'], true) ?? [];
+                            $minPrice = min(array_filter($prices, 'is_numeric')) ?: 'N/A';
+                            echo is_numeric($minPrice) ? number_format($minPrice, 0, '', ' ') . ' руб.' : $minPrice;
+                            ?>
+                        </td>
+                        <td><?= date('d.m.Y', strtotime($listing['created_at'])) ?></td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="../index.php?page=view_listing&id=<?= $listing['id'] ?>" class="btn btn-info" target="_blank" title="Посмотреть"><i class="fas fa-eye"></i></a>
+                                <?php if ($listing['status'] == 'moderation' || $listing['status'] == 'rejected'): ?>
+                                    <a href="?page=edit_listing&id=<?= $listing['id'] ?>" class="btn btn-primary" title="Редактировать"><i class="fas fa-edit"></i></a>
+                                <?php endif; ?>
+                                <form action="../index.php?page=delete_listing" method="POST" onsubmit="return confirm('Удалить это объявление?');" style="display: inline;">
+                                    <input type="hidden" name="listing_id" value="<?= $listing['id'] ?>">
+                                    <button type="submit" class="btn btn-danger" title="Удалить"><i class="fas fa-trash"></i></button>
+                                </form>
+                                <?php if ($listing['status'] == 'published'): ?>
+                                    <a href="#" class="btn btn-warning" title="Деактивировать"><i class="fas fa-pause"></i></a>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer class="bg-secondary text-black text-center py-2">
+    <div class="container">
+        <p class="mb-0">&copy; 2025 Отдых на курортах России без посредников. Дмитрий Попов.</p>
+    </div>
+</footer>
+<script>
+// Включим всплывающие подсказки Bootstrap
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
 </body>
-<?php include 'app/includes/footer.php'; ?>
+</html>

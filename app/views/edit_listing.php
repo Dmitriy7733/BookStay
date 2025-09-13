@@ -1,9 +1,35 @@
-<!-- app/views/upload_form.php -->
+<!-- app/views/edit_listing.php -->
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// Защита страницы
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ?page=login');
+    exit();
+}
+
+$listing_id = $_GET['id'] ?? 0;
+$user_id = $_SESSION['user_id'];
+
+// Функция для получения данных объявления по ID, проверяя, что оно принадлежит пользователю
+$listing = getListingByIdForUser($listing_id, $user_id);
+
+if (!$listing) {
+    $_SESSION['error'] = 'Объявление не найдено или у вас нет прав на его редактирование.';
+    header('Location: ?page=hotelier_listings');
+    exit();
+}
+
+// Если форма была отправлена на обновление, обработать это (логика похожа на создание, но UPDATE запрос)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // ... Ваша логика обработки обновления ...
+    // Вместо вставки (INSERT) делаете обновление (UPDATE) ... WHERE id = $listing_id AND hotelier_id = $user_id
+    // После успеха:
+    // $_SESSION['success'] = 'Объявление успешно обновлено и отправлено на повторную модерацию!';
+    // header('Location: ?page=hotelier_listings');
+    // exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -992,7 +1018,7 @@ if (session_status() === PHP_SESSION_NONE) {
 </div>
 <main>
 <div class="container mt-4">
-    <h2>Добавить новое объявление</h2>
+    <h2>Редактировать объявление</h2>
     <?php
     // Отображение сообщений об ошибках и успехах
     if (isset($_SESSION['error'])) {
@@ -1012,7 +1038,7 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 
     <form id="listingForm" enctype="multipart/form-data">
-        <!-- <input type="hidden" name="hotelier_id" value="<?= $_SESSION['user_id'] ?>"> -->
+    <input type="hidden" name="listing_id" value="<?= $listing['id'] ?>">
         
         <!-- Секция 1: Основная информация -->
         <div class="form-section">

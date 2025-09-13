@@ -56,7 +56,7 @@ class ListingModel {
                 'has_parking' => (bool)$listing['has_parking'],
                 'food_options' => $listing['food_options'],
                 'phone' => $listing['phone'],
-                'wifi_free' => true,
+                'wifi_free' => (bool)$listing['has_wifi'],
                 'reviews_count' => $listing['reviews_count'],
                 'prices' => $this->getListingPrices($listing['id'])
             ];

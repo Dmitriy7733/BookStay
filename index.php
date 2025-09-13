@@ -30,14 +30,17 @@ switch ($page) {
     $ListingController = new ListingController($db);
     $ListingController->fetchListingsBySubcategory();
     break;
+
     case 'search':
-        $searchController = new SearchController($db);
-        $searchController->search(); 
-        break;
+    $searchController = new SearchController($db);
+    $searchController->search();
+    break;
+
     case 'autocomplete_cities':
     $searchController = new SearchController($db);
     $searchController->autocompleteCities();
     break;
+
     case 'get_parent_categories':
         $categoryController = new CategoryController($db);
         $categoryController->getParentCategories();
@@ -51,17 +54,10 @@ switch ($page) {
         $uploadController = new UploadController($db);
         $uploadController->upload();
         break;
-    case 'submit_complaint':
-        $complaintController = new ComplaintController($db);
-        $complaintController->submitComplaint();
-        break;
-    case 'approve_instruction': 
-        $adminController = new AdminController($db); 
-        $adminController->approve(); 
-        break; 
-    case 'delete_instruction': 
-        $adminController = new AdminController($db); 
-        $adminController->delete(); 
+        
+    case 'submit_listing':
+        $uploadController = new UploadController($db);
+        $uploadController->upload(); // Вызываем тот же метод, но он обработает POST
         break;
     case 'block_user':
         $adminController = new AdminController($db);
@@ -74,10 +70,6 @@ switch ($page) {
     case 'delete_user':
         $adminController = new AdminController($db);
         $adminController->deleteUser();
-        break;
-    case 'viewInstruction':
-        $adminController = new AdminController($db);
-        $adminController->viewInstruction();
         break;
     case 'user_management':
         $userManagementController = new UserManagementController($db);
