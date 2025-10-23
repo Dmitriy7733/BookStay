@@ -17,7 +17,9 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    
     <style>
+
       * {
             margin: 0;
             padding: 0;
@@ -38,14 +40,7 @@ if (session_status() === PHP_SESSION_NONE) {
     background-repeat: no-repeat; /* Не повторяем изображение */
     overflow-x: hidden; /* Скрыть горизонтальный скроллинг */
 }
-/* Стили для навигационного меню */
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
+/* Стили для навигационного меню */    
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -270,6 +265,7 @@ if (session_status() === PHP_SESSION_NONE) {
     border-radius: 8px; /* Слегка скругляем углы */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Легкая тень для объема */
 }
+
 /* Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {
   .container {
@@ -278,7 +274,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 /* Medium devices (tablets, 768px and up) */
-@media (minmin-width: 768px) {
+@media (min-width: 768px) {
   .container {
     max-width: 720px;
   }
@@ -481,7 +477,6 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #6c757d;
         }
         
-        
         .search-btn {
             background: #007bff;
             color: white;
@@ -497,16 +492,7 @@ if (session_status() === PHP_SESSION_NONE) {
         .search-btn:hover {
             background: #0056b3;
         }
-        
-        /* Стили для выпадающих меню */
-        .dropdown-menu-custom {
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border: none;
-            min-width: 300px;
-        }
-        
+
         .people-selector {
             padding: 15px;
         }
@@ -803,7 +789,43 @@ if (session_status() === PHP_SESSION_NONE) {
         margin-top: 10px;
     }
 }
+.carousel-control-prev, .carousel-control-next {
+    width: 5%;
+}
 
+.carousel-item img {
+    border-radius: 5px;
+    height: 200px;
+    object-fit: cover;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
+
+.goods__image {
+    position: relative;
+}
+
+.goods__image .carousel {
+    height: 200px;
+}
+
+.goods__image .carousel-item {
+    height: 200px;
+}
 /* Стили для заголовков и контейнеров */
 .mb-4 {
     margin-bottom: 1.5rem !important;
@@ -864,7 +886,371 @@ if (session_status() === PHP_SESSION_NONE) {
 #backToCategories:hover {
     background: #2980b9;
 }
+#previewCarousel {
+    height: 200px;
+    position: relative;
+}
+
+#previewCarousel .carousel-inner {
+    height: 100%;
+    border-radius: 5px;
+}
+
+#previewCarousel .carousel-item {
+    height: 100%;
+}
+
+#previewCarousel .carousel-item img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Убедимся, что стрелки видны */
+#previewCarousel .carousel-control-prev,
+#previewCarousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+#previewCarousel .carousel-control-prev:hover,
+#previewCarousel .carousel-control-next:hover {
+    opacity: 1;
+}
+
+#previewCarousel .carousel-control-prev {
+    left: 10px;
+}
+
+#previewCarousel .carousel-control-next {
+    right: 10px;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
+.status-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+
+/* Обертка для стрелок карусели, чтобы располагать их по центру по вертикали */
+.carousel {
+    position: relative;
+}
+.carousel-controls {
+    position: absolute;
+    top: 50%; /* Расположить по вертикали по центру изображения */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    transform: translateY(-50%); /* Центрировать по вертикали */
+    z-index: 5;
+}
+.carousel-control-prev-custom,
+.carousel-control-next-custom {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+.carousel-control-prev-custom:hover,
+.carousel-control-next-custom:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Убираем стандартные стрелки Bootstrap, чтобы оставить только наши */
+.carousel-control-prev,
+.carousel-control-next {
+    display: none;
+}
+/* Стили для inline-подсказок*/
+.inline-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 40px; /* Отступ под иконку */
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-top: -1px;
+}
+
+.inline-suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background-color 0.2s;
+}
+
+.inline-suggestion-item:hover:hover {
+    background-color: #f8f9fa;
+}
+
+.inline-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-icon {
+    color: #6c757d;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.suggestion-text {
+    flex: 1;
+    font-size: 14px;
+}
+
+.suggestion-text strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.region-text {
+    color: #6c757d;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+/* Адаптация для поля поиска */
+.search-field {
+    position: relative;
+}
+
+.search-field:focus-within {
+    z-index: 1001; /* Поднимаем поле при фокусе */
+}
+
+/* Плавное появление */
+.inline-suggestions {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* Стили для новой структуры */
+.container-fluid {
+    padding: 0 15px;
+}
+
+/* Боковая панель */
+.sidebar-categories {
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    min-height: calc(100vh - 200px);
+    padding: 20px 0;
+    position: relative;
+}
+
+.sidebar-sticky {
+    position: sticky;
+    top: 20px;
+}
+
+.s.sidebar-header {
+    padding: 0 20px 15px;
+    border-bottom: 2px solid #007bff;
+    margin-bottom: 15px;
+}
+
+.sidebar-header h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Основной контент */
+.main-content {
+    padding: 0 0 0 25px;
+    min-height: 600px;
+}
+
+/* Адаптация сетки карточек */
+#categoriesContainer .col-xl-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+}
+
+#categoriesContainer .col-lg-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+#categoriesContainer .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+/* Стили для навигации боковой панели */
+.sideidebar-nav {
+    padding: 0 15px;
+}
+
+.nav-category {
+    margin-bottom: 8px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.nav-category-header {
+    background: #fff;
+    padding: 12px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-category-header:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.nav-category-header.active {
+    background: #007bff;
+    color: white;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 12px;
+}
+
+.nav-category-header.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.nav-subcategories {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.nav-subcategories.expanded {
+    max-height: 500px;
+}
+
+.nav-subcategory-link {
+    display: block;
+    padding: 10px 15px 10px 25px;
+    color: #495057;
+    text-decoration: none;
+    border-bottom: 1px solid #f8f9fa;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.nav-subcategory-link:hover {
+    background: #e3f2fd;
+    color: #007bff;
+    padding-left: 30px;
+}
+
+/* Мобильная версия */
+.sidebar-mobile-toggle {
+    display: none;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .sidebar-mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
     
+    .sidebar-categories {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        z-index: 1050;
+        background: white;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+        padding: 20px 0;
+    }
+    
+    .sidebar-categories.mobile-open {
+    left: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+    
+    .main-content {
+        padding: 0;
+    }
+    
+    #categoriesContainer .col-md-6,
+    #categoriesContainer .col-lg-6,
+    #categoriesContainer .col-xl-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+
     </style>
 </head>
 <body>
@@ -892,35 +1278,94 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 </nav>
 </div>
-<div class="register-container">
-    <h2>Регистрация</h2>
-    <?php 
-    if (isset($_SESSION['errors'])) { foreach ($_SESSION['errors'] as $error) { echo "<div class='alert alert-danger'>$error</div>"; } unset($_SESSION['errors']); } 
-    ?>
-    
-    <form action="index.php?page=register" method="post">
-        <div class="form-group">
-            <label for="username">Логин</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <divdiv class="card-body">
+                    <h2 class="card-title text-center">Регистрация</h2>
+                    
+                    <?php 
+                    if (isset($_SESSION['errors'])) { 
+                        foreach ($_SESSION['errors'] as $error) { 
+                            echo "<div class='alert alert-danger'>$error</div>"; 
+                        } 
+                        unset($_SESSION['errors']); 
+                    } 
+                    ?>
+                    
+                    <form action="index.php?page=register" method="post">
+                        <div class="form-group">
+                            <label for="username">Логин</label>
+                            <input type="text" class="form-control" id="username" name="username" required 
+                                   placeholder="Введите логин (3-20 символов)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Пароль</label>
+                            <input type="password" class="form-control" id="password" name="password" required 
+                                   placeholder="Введите пароль (6-20 символов)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm_password">Повторите пароль</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required 
+                                   placeholder="Повторите пароль">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="role">Выберите роль</label>
+                            <select class="form-control" id="role" name="role" required>
+                                <option value="">-- Выберите роль --</option>
+                                <option value="guest">Гость (поиск жилья)</option>
+                                <option value="hotelier">Отельер (размещение объявлений)</option>
+                            </select>
+                            <small class="form-text text-muted">
+                                Гость - может искать и бронировать жилье<br>
+                                Отельер - может размещать объявления об аренде
+                            </small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="captcha">Пожалуйста, введите текст с изображения:</label>
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="../app/includes/captcha.php" alt="Капча" id="captchaImage" class="mr-2">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="refreshCaptcha()">
+                                    <i class="fas fa-redo"></i> Обновить
+                                </button>
+                            </div>
+                            <input type="text" class="form-control" id="captcha" name="captcha" required 
+                                   placeholder="Введите текст с картинки">
+                            <div id="captchaError" class="text-danger" style="display:none;"></div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary btn-block" onclick="submitForm()">
+                            Зарегистрироваться
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <p>Уже есть аккаунт? <a href="?page=login">Войдите</a></p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="password">Пароль</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="form-group">
-            <label for="confirm_password">Повторите пароль</label>
-            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-        </div>
-        <div class="form-group">
-            <label for="captcha">Пожалуйста, введите текст с изображения:</label><br>
-            <img src="../app/includes/captcha.php" alt="Капча" id="captchaImage">
-            <button type="button" class="btn btn-secondary" onclick="refreshCaptcha()">Обновить капчу</button>
-            <input type="text" class="form-control" id="captcha" name="captcha" required>
-            <div id="captchaError" class="text-danger" style="display:none;"></div>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="submitForm()">Зарегистрироваться</button>
-    </form>
+    </div>
 </div>
+<!-- footer.php -->  
+<footer class="bg-secondary text-black text-center py-2">
+    <div class="container">
+        <p class="mb-0">&copy; 2025 Отдых на курортах России без посредников. Дмитрий Попов.</p>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+
 <script>
 function refreshCaptcha() {
     var captchaImage = document.getElementById('captchaImage');
@@ -929,7 +1374,24 @@ function refreshCaptcha() {
 function submitForm() {
     var captchaInput = document.getElementById('captcha').value;
     var captchaError = document.getElementById('captchaError');
-
+// Скрыть предыдущую ошибку
+    captchaError.style.display = 'none';
+    
+    // Базовая проверка формы перед отправкой
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    var confirmPassword = document.getElementById('confirm_password').value;
+    var role = document.getElementById('role').value;
+    
+    if (!username || !password || !confirmPassword || !role || !captchaInput) {
+        alert('Пожалуйста, заполните все поля');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        alert('Пароли не совпадают');
+        return;
+    }
     fetch('../app/validate_captcha.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -942,10 +1404,15 @@ function submitForm() {
         } else {
             captchaError.textContent = data.message;
             captchaError.style.display = 'block';
+            refreshCaptcha(); // Обновить капчу при ошибке
         }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при проверке капчи');
     });
 }
 </script>
 
 </body>
-<?php include 'app/includes/footer.php'; ?>
+</html>

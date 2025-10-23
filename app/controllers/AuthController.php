@@ -11,11 +11,24 @@ class AuthController {
 
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = htmlspecialchars(trim($_POST['username'] ?? ''));
-            $password = $_POST['password'] ?? '';
-
-            $user = $this->model->authenticate($username, $password);
-
+        $username = htmlspecialchars(trim($_POST['username'] ?? ''));
+        $password = $_POST['password'] ?? '';
+        
+        // ВАЛИДАЦИЯ ПАРОЛЯ
+        if (empty($password) || strlen(trim($password)) === 0) {
+            $_SESSION['error'] = "Пароль не может быть пустым";
+            require_once __DIR__ . '/../views/auth/login.php';
+            return;
+        }
+        
+        // ВАЛИДАЦИЯ ЛОГИНА
+        if (empty($username)) {
+            $_SESSION['error'] = "Логин не может быть пустым";
+            require_once __DIR__ . '/../views/auth/login.php';
+            return;
+        }
+        
+        $user = $this->model->authenticate($username, $password);
             if ($user) {
                 // Успешная аутентификация
                 $_SESSION['role'] = $user['role'];
@@ -26,17 +39,11 @@ class AuthController {
 
                 // Перенаправление в зависимости от роли
                 if ($user['role'] === 'admin') {
-                    header('Location: index.php?page=admin_form');
-                } elseif ($user['role'] === 'manager_tmz') {
-                    header('Location: index.php?page=user_management');
-                } elseif ($user['role'] === 'admin_tmz') {
-                    header('Location: index.php?page=admin_tmz');
-                } elseif ($user['role'] === 'editor_tmz') {
-                    header('Location: index.php?page=editor_tmz');
-                } elseif ($user['role'] === 'user_tmz') {
-                    header('Location: index.php?page=home_tmz');
-                } elseif ($user['role'] === 'user') {
+                    header('Location: index.php?page=admin_dashboard');
+                } elseif ($user['role'] === 'guest') {
                     header('Location: index.php');
+                } elseif ($user['role'] === 'hotelier') {
+                    header('Location: index.php?page=hotelier_dashboard');
                 }
                 exit();
             } else {
@@ -47,18 +54,12 @@ class AuthController {
         // Если пользователь уже аутентифицирован, перенаправляем на соответствующую страницу
         if (isset($_SESSION['role'])) {
             if ($_SESSION['role'] === 'admin') {
-                header('Location: index.php?page=admin_form');
-            } elseif ($_SESSION['role'] === 'user') {
+                header('Location: index.php?page=admin_dashboard');
+            } elseif ($_SESSION['role'] === 'guest') {
                 header('Location: index.php');
-            } elseif ($_SESSION['role'] === 'admin_tmz') {
-                header('Location: index.php?page=admin_tmz');
-            } elseif ($_SESSION['role'] === 'editor_tmz') {
-                header('Location: index.php?page=editor_tmz');
-            } elseif ($_SESSION['role'] === 'user_tmz') {
-                header('Location: index.php?page=home_tmz');
-            } elseif ($_SESSION['role'] === 'superuser_tmz') {
-                header('Location: index.php?page=user_management');
-            }
+            } elseif ($_SESSION['role'] === 'hotelier') {
+                header('Location: index.php?hotelier_dashboard');
+            } 
             exit();
         }
         if (isset($_SESSION['is_blocked']) && $_SESSION['is_blocked'] === true) {
@@ -113,12 +114,23 @@ class AuthController {
         require_once __DIR__ . '/../views/auth/change_password.php';
     }
     public function logout() {
-        // Уничтожаем все данные сессии
-        $_SESSION = array();
-        // Очищаем массив сессии
-        session_destroy();
-        // Перенаправляем пользователя на страницу входа или главную страницу
-        header("Location: index.php");
-        exit();
+    // Очищаем все данные сессии
+    $_SESSION = array();
+    
+    // Если используется cookie сессии, удаляем его
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
     }
+    
+    // Уничтожаем сессию
+    session_destroy();
+    
+    // Перенаправляем на главную страницу
+    header("Location: index.php");
+    exit();
+}
 }

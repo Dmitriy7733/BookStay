@@ -9,15 +9,94 @@ if (session_status() === PHP_SESSION_NONE) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Курортик</title>
+    <meta name="description" content="Широкий выбор механических клавиатур с доставкой по Москве. Гарантия 2 года, отзывы покупателей. Подберите идеальную клавиатуру для игр и работы!">
+    <title>Курортик-отдых</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-      * {
+/* Специфичные стили для price dropdown */
+.price-dropdown {
+    min-width: 300px;
+    padding: 0;
+}
+
+.price-presets .btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.price-presets .btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.price-selector .form-control {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.price-selector .form-label {
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+/* Убедимся, что dropdown правильно позиционируется */
+.search-field.dropdown {
+    position: relative;
+}
+
+.dropdown-menu.price-dropdown {
+    transform: translateX(-50%) !important;
+    left: 50% !important;
+    top: 100% !important;
+}
+
+
+/* Стили для карт */
+.map-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden; /* Убираем скроллбары */
+    background: #f8f9fa;
+}
+
+/* На мобильных устройствах */
+@media (max-width: 768px) {
+    .map-container {
+        height: 400px !important; /* Достаточная высота для скролла */
+    }
+    
+    /* Убедитесь, что iframe не блокирует события */
+    .map-container iframe {
+        pointer-events: auto !important;
+        touch-action: auto !important;
+    }
+}
+
+/* Улучшение скролла для iOS */
+.map-container {
+    scroll-behavior: smooth;
+}
+
+
+
+/* Кнопка карты */
+.toggle-map-btn {
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.map-icon-btn {
+    padding: 0.25rem 0.5rem;
+}
+      
+* {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -37,14 +116,7 @@ if (session_status() === PHP_SESSION_NONE) {
     background-repeat: no-repeat; /* Не повторяем изображение */
     overflow-x: hidden; /* Скрыть горизонтальный скроллинг */
 }
-/* Стили для навигационного меню */
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
+/* Стили для навигационного меню */    
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -212,9 +284,6 @@ if (session_status() === PHP_SESSION_NONE) {
             .parent1, .swiper-slide {
         position: relative;
     }
-            .admin-form {
-                grid-template-columns: 1fr;
-            }
             
             .nav__fluid {
                 padding: 0 20px;
@@ -269,6 +338,7 @@ if (session_status() === PHP_SESSION_NONE) {
     border-radius: 8px; /* Слегка скругляем углы */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Легкая тень для объема */
 }
+
 /* Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {
   .container {
@@ -277,7 +347,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 /* Medium devices (tablets, 768px and up) */
-@media (minmin-width: 768px) {
+@media (min-width: 768px) {
   .container {
     max-width: 720px;
   }
@@ -480,7 +550,6 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #6c757d;
         }
         
-        
         .search-btn {
             background: #007bff;
             color: white;
@@ -496,16 +565,7 @@ if (session_status() === PHP_SESSION_NONE) {
         .search-btn:hover {
             background: #0056b3;
         }
-        
-        /* Стили для выпадающих меню */
-        .dropdown-menu-custom {
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border: none;
-            min-width: 300px;
-        }
-        
+
         .people-selector {
             padding: 15px;
         }
@@ -802,7 +862,43 @@ if (session_status() === PHP_SESSION_NONE) {
         margin-top: 10px;
     }
 }
+.carousel-control-prev, .carousel-control-next {
+    width: 5%;
+}
 
+.carousel-item img {
+    border-radius: 5px;
+    height: 200px;
+    object-fit: cover;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
+
+.goods__image {
+    position: relative;
+}
+
+.goods__image .carousel {
+    height: 200px;
+}
+
+.goods__image .carousel-item {
+    height: 200px;
+}
 /* Стили для заголовков и контейнеров */
 .mb-4 {
     margin-bottom: 1.5rem !important;
@@ -863,18 +959,381 @@ if (session_status() === PHP_SESSION_NONE) {
 #backToCategories:hover {
     background: #2980b9;
 }
+#previewCarousel {
+    height: 200px;
+    position: relative;
+}
+
+#previewCarousel .carousel-inner {
+    height: 100%;
+    border-radius: 5px;
+}
+
+#previewCarousel .carousel-item {
+    height: 100%;
+}
+
+#previewCarousel .carousel-item img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Убедимся, что стрелки видны */
+#previewCarousel .carousel-control-prev,
+#previewCarousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+#previewCarousel .carousel-control-prev:hover,
+#previewCarousel .carousel-control-next:hover {
+    opacity: 1;
+}
+
+#previewCarousel .carousel-control-prev {
+    left: 10px;
+}
+
+#previewCarousel .carousel-control-next {
+    right: 10px;
+}
+
+#additionalPhotosContainer img {
+    transition: transform 0.2s;
+}
+
+#additionalPhotosContainer img:hover {
+    transform: scale(1.05);
+}
+
+.position-relative {
+    transition: opacity 0.3s;
+}
+
+.position-relative:hover {
+    opacity: 0.8;
+}
+.status-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+
+/* Обертка для стрелок карусели, чтобы располагать их по центру по вертикали */
+.carousel {
+    position: relative;
+}
+.carousel-controls {
+    position: absolute;
+    top: 50%; /* Расположить по вертикали по центру изображения */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    transform: translateY(-50%); /* Центрировать по вертикали */
+    z-index: 5;
+}
+.carousel-control-prev-custom,
+.carousel-control-next-custom {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+.carousel-control-prev-custom:hover,
+.carousel-control-next-custom:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Убираем стандартные стрелки Bootstrap, чтобы оставить только наши */
+.carousel-control-prev,
+.carousel-control-next {
+    display: none;
+}
+/* Стили для inline-подсказок*/
+.inline-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 40px; /* Отступ под иконку */
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-top: -1px;
+}
+
+.inline-suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background-color 0.2s;
+}
+
+.inline-suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.inline-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-icon {
+    color: #6c757d;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.suggestion-text {
+    flex: 1;
+    font-size: 14px;
+}
+
+.suggestion-text strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.region-text {
+    color: #6c757d;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+/* Адаптация для поля поиска */
+.search-field {
+    position: relative;
+}
+
+.search-field:focus-within {
+    z-index: 1001; /* Поднимаем поле при фокусе */
+}
+
+/* Плавное появление */
+.inline-suggestions {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* Стили для новой структуры */
+.container-fluid {
+    padding: 0 15px;
+}
+
+/* Боковая панель */
+.sidebar-categories {
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    min-height: calc(100vh - 200px);
+    padding: 20px 0;
+    position: relative;
+}
+
+.sidebar-sticky {
+    position: sticky;
+    top: 20px;
+}
+
+.s.sidebar-header {
+    padding: 0 20px 15px;
+    border-bottom: 2px solid #007bff;
+    margin-bottom: 15px;
+}
+
+.sidebar-header h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Основной контент */
+.main-content {
+    padding: 0 0 0 25px;
+    min-height: 600px;
+}
+
+/* Адаптация сетки карточек */
+#categoriesContainer .col-xl-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+}
+
+#categoriesContainer .col-lg-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+#categoriesContainer .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+/* Стили для навигации боковой панели */
+.sidebar-nav {
+    padding: 0 15px;
+}
+
+.nav-category {
+    margin-bottom: 8px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.nav-category-header {
+    background: #fff;
+    padding: 12px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-category-header:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.nav-category-header.active {
+    background: #007bff;
+    color: white;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 12px;
+}
+
+.nav-category-header.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.nav-subcategories {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.nav-subcategories.expanded {
+    max-height: 500px;
+}
+
+.nav-subcategory-link {
+    display: block;
+    padding: 10px 15px 10px 25px;
+    color: #495057;
+    text-decoration: none;
+    border-bottom: 1px solid #f8f9fa;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.nav-subcategory-link:hover {
+    background: #e3f2fd;
+    color: #007bff;
+    padding-left: 30px;
+}
+
+/* Мобильная версия */
+.sidebar-mobile-toggle {
+    display: none;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .sidebar-mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
     
+    .sidebar-categories {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        z-index: 1050;
+        background: white;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+        padding: 20px 0;
+    }
+    
+    .sidebar-categories.mobile-open {
+    left: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+    
+    .main-content {
+        padding: 0;
+    }
+    
+    #categoriesContainer .col-md-6,
+    #categoriesContainer .col-lg-6,
+    #categoriesContainer .col-xl-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+
     </style>
 </head>
 <body>
-
 <!-- Навигационная панель -->
 <div class="container">
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="#">
             <img src="/app/includes/free-icon-appliances.png" alt="Логотип" style="height: 40px; margin-right: 10px;">
-            Курортик
+            <h1> Курортик </h1>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
             <span class="navbar-toggler-icon"></span>
@@ -892,8 +1351,8 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 </nav>
 </div>
-<main>
 
+<main>
 <!-- Навигационное меню с категориями -->
     <div class="container">
     <div class="nav">
@@ -953,15 +1412,17 @@ if (session_status() === PHP_SESSION_NONE) {
         <form class="search-form" id="searchMainForm">
             <div class="search-row">
                 <!-- Поле для поиска города/направления -->
-                <div class="search-field">
-    <i class="fas fa-map-marker-alt"></i>
-    <div class="field-text">
-        <input type="text" id="city-input" name="city" 
-               placeholder="Введите направление (например, Ялта)"
-               class="city-autocomplete-input">
-        <input type="hidden" id="city-id-input" name="cityId">
-    </div>
-</div>
+                <div class="search-field" style="position: relative;">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="field-text">
+                        <input type="text" id="city-input" name="city" 
+                               placeholder="Введите направление (например, Ялта)" 
+                               class="city-autocomplete-input"
+                               autocomplete="off">
+                        <input type="hidden" id="city-id-input" name="cityId">
+                    </div>
+                    <!-- Контейнер для подсказок добавлен через JS -->
+                </div>
                 
                 <!-- Поле для выбора даты заезда -->
 <div class="search-field date-field" id="checkinField">
@@ -994,8 +1455,42 @@ if (session_status() === PHP_SESSION_NONE) {
                     <input type="hidden" id="adult-input" name="adult" value="2">
                     <input type="hidden" id="child-input" name="child" value="0">
                 </div>
-            </div>
-            
+                <!-- Поле для выбора цены с выпадающим окном -->
+<div class="dropdown search-field" id="priceDropdownContainer">
+    <input type="hidden" id="price-min-input" name="priceMin">
+  <input type="hidden" id="price-max-input" name="priceMax">
+  <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="priceDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="placeholder" id="pricePlaceholder">Любая цена</span>
+    <span class="selected-value" id="priceValue" style="display:none"></span>
+  </button>
+  <div class="dropdown-menu" aria-labelledby="priceDropdownButton" id="priceDropdownMenu">
+    <div class="p-3">
+      <h5>Диапазон цен за ночь</h5>
+      <div class="row mb-3">
+        <div class="col-6">
+          <label class="form-label small">От, руб.</label>
+          <input type="number" class="form-control form-control-sm" id="priceMinInput" placeholder="0" min="0">
+        </div>
+        <div class="col-6">
+          <label class="form-label small">До, руб.</label>
+          <input type="number" class="form-control form-control-sm" id="priceMaxInput" placeholder="Любая" min="0">
+        </div>
+      </div>
+      <div class="price-presets mb-3">
+        <div class="btn-group btn-group-sm w-100" role="group" aria-label="Быстрые пресеты цен">
+          <button type="button" class="btn btn-outline-secondary price-preset" data-min="0" data-max="2000">до 2 000</button>
+          <button type="button" class="btn btn-outline-secondary price-preset" data-min="2000" data-max="5000">2-5 тыс.</button>
+          <button type="button" class="btn btn-outline-secondary price-preset" data-min="5000" data-max="10000">5-10 тыс.</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm w-100" id="applyPrice">Применить</button>
+      <button class="btn btn-outline-secondary btn-sm w-100 mt-2" id="resetPrice">Сбросить</button>
+    </div>
+  </div>
+</div>
+
+
+</div>
             <button type="submit" class="search-btn">
                 <i class="fas fa-search"></i> Найти
             </button>
@@ -1031,41 +1526,95 @@ if (session_status() === PHP_SESSION_NONE) {
 </div>
 </div>
 <!-- БЛОК ПОИСКА конец-->
-
+<div class="container d-md-none">
+    <button class="sidebar-mobile-toggle">
+        <i class="fas fa-bars"></i> 
+        <span>Показать категории</span>
+    </button>
+    <div class="sidebar-overlay"></div>
+</div>
 <div class="container">
-    <h2 id="mainTitle" class="text-center">Популярные направления для отдыха</h2>
-    <!-- Контейнер для категорий -->
-    <div id="categoriesContainer" class="row">
-        <?php
-        // Отображаем категории и подкатегории
-        foreach ($categoryGroups as $category) {
-            echo "<div class='col-xl-3 col-lg-4 col-md-6 mb-4'>";
-            echo "<div class='card shadow-sm h-100'>";
-            echo "<div class='card-body d-flex flex-column'>";
-            echo "<h5 class='card-title'>{$category['name']}</h5>";
-            echo "<div class='dropdown mt-auto'>";
-            echo "<button class='btn btn-primary dropdown-toggle btn-block' type='button' id='categoryDropdown{$category['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>Выбрать подкатегорию</button>";
-            echo "<div class='dropdown-menu' aria-labelledby='categoryDropdown{$category['id']}'>";
+    <div class="row">
+        <!-- БОКОВАЯ ПАНЕЛЬ СЛЕВА -->
+        <aside class="col-lg-3 col-md-4 d-none d-md-block sidebar-categories">
+            <div class="sidebar-sticky">
+                <div class="sidebar-header">
+                    <h5><i class="fas fa-list-alt"></i> Все категории</h5>
+                </div>
+                <nav class="sidebar-nav">
+                    <?php foreach ($categoryGroups as $category): ?>
+                    <div class="nav-category">
+                        <div class="nav-category-header" 
+                             data-category-id="<?= $category['id'] ?>">
+                            <span><?= htmlspecialchars($category['name']) ?></span>
+                            <?php if (!empty($category['subcategories'])): ?>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <?php if (!empty($category['subcategories'])): ?>
+                        <div class="nav-subcategories">
+                            <?php foreach ($category['subcategories'] as $subcategory): ?>
+                            <a href="#" 
+                               class="nav-subcategory-link"
+                               data-subcategory-id="<?= $subcategory['id'] ?>"
+                               data-subcategory-name="<?= htmlspecialchars($subcategory['name']) ?>">
+                                <i class="fas fa-angle-right"></i>
+                                <?= htmlspecialchars($subcategory['name']) ?>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php endforeach; ?>
+                </nav>
+            </div>
+        </aside>
 
-            // Проверяем, есть ли подкатегории
-            if (!empty($category['subcategories'])) {
-                foreach ($category['subcategories'] as $subcategory) {
-                    echo "<a class='dropdown-item subcategory-link' href='#' data-subcategory-id='{$subcategory['id']}' data-subcategory-name='{$subcategory['name']}'>{$subcategory['name']}</a>";
-                }
-            } else {
-                echo "<a class='dropdown-item disabled' href='#'>Нет подкатегорий</a>";
-            }
-
-            echo "</div></div>";
-            echo "</div>";
-            echo "</div>";
-            echo "</div>";
-        }
-        ?>
-    </div>
-    
+        <!-- ОСНОВНОЙ КОНТЕНТ СПРАВА -->
+        <main class="col-lg-9 col-md-8 main-content">
+            <!-- Заголовок -->
+            <h2 id="mainTitle" class="text-center mb-4">Популярные направления направления для отдыха</h2>
+            
+            <!-- КОНТЕЙНЕР КАРТОЧЕК КАТЕГОРИЙ -->
+            <div id="categoriesContainer" class="row">
+                <?php foreach ($categoryGroups as $category): ?>
+                <div class='col-xl-4 col-lg-6 col-md-6 mb-4'>
+                    <div class='card shadow-sm h-100'>
+                        <div class='card-body d-flex flex-column'>
+                            <h5 class='card-title'><?= $category['name'] ?></h5>
+                            <div class='dropdown mt-auto'>
+                                <button class='btn btn-primary dropdown-toggle btn-block' 
+                                        type='button' 
+                                        id='categoryDropdown<?= $category['id'] ?>' 
+                                        data-toggle='dropdown' 
+                                        aria-haspopup='true' 
+                                        aria-expanded='false'>
+                                    Выбрать подкатегорию
+                                </button>
+                                <div class='dropdown-menu' aria-labelledby='categoryDropdown<?= $category['id'] ?>'>
+                                    <?php if (!empty($category['subcategories'])): ?>
+                                        <?php foreach ($category['subcategories'] as $subcategory): ?>
+                                            <a class='dropdown-item subcategory-link' 
+                                               href='#' 
+                                               data-subcategory-id='<?= $subcategory['id'] ?>' 
+                                               data-subcategory-name='<?= $subcategory['name'] ?>'>
+                                                <?= $subcategory['name'] ?>
+                                            </a>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <a class='dropdown-item disabled' href='#'>Нет подкатегорий</a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        
     <!-- Контейнер для объявлений с кнопкой возврата -->
-<div id="listingsContainer" class="row listings-container" style="display: none;">
+        <div id="listingsContainer" class="row listings-container" style="display: none;">
     <!-- Кнопка возврата к категориям -->
     <div class="col-12 mb-4">
         <button id="backToCategories" class="btn btn-secondary back-to-categories">
@@ -1088,139 +1637,29 @@ if (session_status() === PHP_SESSION_NONE) {
     
     <!-- Пагинация для результатов поиска -->
     <div id="searchPagination" class="col-12 mt-4" style="display: none;"></div>
+        </div>
+        </main>
     </div>
 </div>
 
-</main>
-<!-- footer.php -->
-    
+<!-- footer.php -->  
 <footer class="bg-secondary text-black text-center py-2">
     <div class="container">
         <p class="mb-0">&copy; 2025 Отдых на курортах России без посредников. Дмитрий Попов.</p>
     </div>
 </footer>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-<script src="../assets/download.js"></script>
+<script src="../assets/search.js"></script>
+<script src="../assets/sidebar.js"></script>
 <script src="../assets/correct.js"></script>
-    <script>
-// Обработчик отправки формы поиска
-$('#searchMainForm').on('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = {
-        cityId: $('#city-id-input').val(),
-        dateFrom: $('#dateFrom-input').val(),
-        dateTo: $('#dateTo-input').val(),
-        adult: $('#adult-input').val(),
-        child: $('#child-input').val()
-    };
-    
-    // Выполняем поиск
-    performSearch(formData);
-});
-// Функция выполнения поиска
-function performSearch(searchParams) {
-    // Валидация обязательных полей
-    if (!searchParams.cityId) {
-        alert('Пожалуйста, выберите направление');
-        return;
-    }
-    
-    $.ajax({
-        url: '../index.php?page=search',
-        type: 'POST',
-        data: searchParams,
-        dataType: 'json',
-        success: function(response) {
-            if (response.success && response.listings) {
-                displaySearchResults(response.listings, response.searchParams, response.pagination);
-            } else {
-                alert(response.message || 'Объявления не найдены');
-                $('#listingsContent').html('<div class="col-12"><p class="text-center">Объявления не найдены</p></div>');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', status, error);
-            alert('Ошибка соединения с сервером');
-            $('#listingsContent').html('<div class="col-12"><p class="text-center">Ошибка загрузки данных</p></div>');
-        }
-    });
-}
+<script>
 
-// Функция отображения результатов поиска
-function displaySearchResults(listings, searchParams, pagination) {
-    // Скрываем категории и показываем контейнер объявлений
-    $('#categoriesContainer').hide();
-    $('#listingsContainer').show();
-    
-    // Показываем заголовок поиска, скрываем заголовок подкатегорий
-    $('#searchResultsTitle').show();
-    $('#subcategoryTitle').hide();
-    
-    // Обновляем основной заголовок
-    const cityName = searchParams.cityName;
-    const correctForm = getCorrectPrepositionForm(cityName);
-    $('#mainTitle').text(`Результаты поиска: отдых в ${correctForm}`);
-    
-    // Отображаем объявления
-    displayListings(listings, cityName);
-    
-    // Отображаем пагинацию, если есть
-    if (pagination && pagination.totalPages > 1) {
-        displayPagination(pagination);
-    } else {
-        $('#searchPagination').hide();
-    }
-}
-
-// Инициализация при загрузке
-$(document).ready(function() {
-    setupCityAutocomplete();
-    
-    // Закрываем все подменю при загрузке
-    $('.ul_second_nav').hide();
-});
-
-// Функция для автозаполнения направления (без выпадающего меню)
-function setupCityAutocomplete() {
-    $('#city-input').on('input', function() {
-        const query = $(this).val().trim();
-        if (query.length > 2) {
-            $.ajax({
-                url: '../index.php?page=autocomplete_cities',
-                type: 'POST',
-                data: { query: query },
-                dataType: 'json',
-                success: function(cities) {
-                    if (cities && cities.length > 0) {
-                        $('#city-id-input').val(cities[0].id);
-                    } else {
-                        $('#city-id-input').val('');
-                    }
-                },
-                error: function() {
-                    $('#city-id-input').val('');
-                }
-            });
-        } else {
-            $('#city-id-input').val('');
-        }
-    });
-}
-
-
-// Инициализация при загрузке
-$(document).ready(function() {
-    setupCityAutocomplete();
-});
-
-
-/*оооооооооооооооооооооооооооооооооооооооооооооооооооооо*/
 // Функция отображения объявлений для подкатегорий
 function displaySubcategoryListings(listings, subcategoryName) {
     // Скрываем категории и показываем контейнер объявлений
@@ -1242,7 +1681,7 @@ function displaySubcategoryListings(listings, subcategoryName) {
 // Обработчик клика по подкатегории в навигационном меню
 $(document).on('click', '.nav .subcategory-link', function(e) {
     e.preventDefault();
-    e.stopPropagation(); // Важно: останавливаем всплытие
+    e.stopPropagation(); // останавливаем всплытие
     
     const subcategoryId = $(this).data('subcategory-id');
     const subcategoryName = $(this).data('subcategory-name');
@@ -1312,6 +1751,7 @@ function loadListingsBySubcategory(subcategoryId, subcategoryName) {
         }
     });
 }
+
 // Функция отображения пагинации
 function displayPagination(pagination) {
     let html = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
@@ -1341,24 +1781,6 @@ function displayPagination(pagination) {
     $('#searchPagination').html(html).show();
 }
 
-// Обработчик клика по пагинации
-$(document).on('click', '#searchPagination .page-link', function(e) {
-    e.preventDefault();
-    const page = $(this).data('page');
-    
-    // Получаем текущие параметры поиска
-    const searchParams = {
-        cityId: $('#city-id-input').val(),
-        dateFrom: $('#dateFrom-input').val(),
-        dateTo: $('#dateTo-input').val(),
-        adult: $('#adult-input').val(),
-        child: $('#child-input').val(),
-        page: page
-    };
-    
-    // Выполняем поиск с новой страницей
-    performSearch(searchParams);
-});
 
 // Универсальная функция отображения объявлений
 function displayListings(listings, title) {
@@ -1368,22 +1790,50 @@ function displayListings(listings, title) {
         html = '<div class="col-12"><p class="text-center">Объявления не найдены</p></div>';
     } else {
         listings.forEach(listing => {
+            const carouselId = `carouselListing${listing.id}`;
+            const mapId = `mapContainer${listing.id}`;
+            const photoCount = listing.all_photos.length;
             html += `
             <div class="goods mb-4">
                 <div class="goods__image">
-                    <a title="Еще фотографии на странице" class="slide_hover" 
-                       data-photos="${listing.photos.join(',')}" 
-                       href="/listing/${listing.id}/" 
-                       style="background-image: url('${listing.main_photo}')"></a>
+                    <div id="${carouselId}" class="carousel slide" data-ride="carousel">
+                        <!-- Индикаторы -->
+                        ${photoCount > 1 ? `
+                        <ol class="carousel-indicators">
+                            ${listing.all_photos.map((photo, index) => `
+                                <li data-target="#${carouselId}" data-slide-to="${index}" class="${index === 0 ? 'active' : ''}"></li>
+                            `).join('')}
+                        </ol>` : ''}
+
+                        <!-- Слайды -->
+                        <div class="carousel-inner">
+                            ${listing.all_photos.map((photo, index) => `
+                                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                    <img src="${photo}" class="d-block w-100" alt="Фото объекта ${index + 1}" style="height: 200px; object-fit: cover;">
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Пользовательские стрелки -->
+                        ${photoCount > 1 ? `
+                        <div class="carousel-controls">
+                            <div class="carousel-control-prev-custom" data-target="#${carouselId}" data-slide="prev" role="button" aria-label="Предыдущий" style="position:absolute; top:50%; left:10px; transform:translateY(-50%); cursor:pointer; z-index:10;">
+                                <i class="fas fa-chevron-left"></i>
+                            </div>
+                            <div class="carousel-control-next-custom" data-target="#${carouselId}" data-slide="next" role="button" aria-label="Следующий" style="position:absolute; top:50%; right:10px; transform:translateY(-50%); cursor:pointer; z-index:10;">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>` : ''}
+                    </div>
                 </div>
                 <div class="goods__content">
                     <div class="goods__title">
-                        <a href="/listing/${listing.id}/">${listing.title}</a>
+                        <h2><a href="/listing/${listing.id}/">${listing.title}</a></h2>
                     </div>
                     <div class="goods__content_row">
                         <div class="goods__detail">
                             <ul>
-                                ${listing.wifi_free ? '<li><font color="#FF0000">Wi-Fi бесплатно</font></li>' : ''}
+                                ${listing.has_wifi ? '<li><font color="#FF0000">Wi-Fi бесплатно</font></li>' : ''}
                                 <li style="max-width: 400px;border: 1px solid rgb(198, 230, 246);background: rgb(205, 240, 246);border-radius: 4px;color: rgba(8, 15, 23, 0.78);">
                                     <strong>До моря:</strong> <span>${listing.distance_to_sea}</span>
                                 </li>
@@ -1392,11 +1842,25 @@ function displayListings(listings, title) {
                                 <li><strong>Питание:</strong> <span>${listing.food_options}</span></li>
                                 <li><strong>Телефоны:</strong> <span>${listing.phone}</span></li>
                             </ul>
+                            
+                            <!-- Кнопка показа карты -->
+                            <div class="mt-2">
+                                <button class="btn btn-outline-primary btn-sm toggle-map-btn" 
+                                        data-listing-id="${listing.id}"
+                                        data-map-code="${escapeHtml(listing.yandex_map_code || '')}"
+                                        data-map-loaded="false">
+                                    <i class="fas fa-map-marker-alt"></i> Показать на карте
+                                </button>
+                            </div>
+
                             <div class="goods__views goods__views_lg">
                                 <span class="hide_xs">
-                                    <a href="/listing/${listing.id}/">Отзывы (${listing.reviews_count})</a>
-                                </span> 
+                                    <a href="/listing/${listing.id}/">
+                                        <i class="fas fa-comments"></i> Отзывов: (${listing.reviews_count})
+                                    </a>
+                                </span>
                             </div>
+
                         </div>
                         <div class="goods__info">
                             <div class="goods__price">
@@ -1415,14 +1879,286 @@ function displayListings(listings, title) {
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Контейнер для карты (скрыт по умолчанию) -->
+                    <div id="${mapId}" class="map-container mt-3" style="display: none; height: 250px; border-radius: 8px; overflow: hidden;"
+                         data-initialized="false">
+                        
+                    </div>
                 </div>
             </div>`;
         });
     }
 
     $('#listingsContent').html(html);
+    initMapButtons();
 }
 
+function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Функция для инициализации кнопок карты
+function initMapButtons() {
+    $('.toggle-map-btn').off('click').on('click', function() {
+        const listingId = $(this).data('listing-id');
+        const mapCode = $(this).data('map-code');
+        const mapContainer = $(`#mapContainer${listingId}`);
+        const button = $(this);
+        const isMapLoaded = button.data('map-loaded');
+
+        if (mapContainer.is(':visible')) {
+            // Скрываем карту и сбрасываем флаг
+            hideMap(mapContainer, button);
+        } else {
+            // Показываем карту
+            showMap(mapContainer, button, mapCode, listingId, isMapLoaded);
+        }
+    });
+}
+
+// Функция для показа карты
+function showMap(mapContainer, button, mapCode, listingId, isMapLoaded) {
+    if (!isMapLoaded) {
+        if (mapCode && mapCode.trim() !== '') {
+            try {
+                const decodedMapCode = mapCode
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#039;/g, "'");
+                
+                // Устанавливаем высоту для ВСЕХ устройств
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                // Для десктопов - одна высота, для мобильных - другая
+                if (isMobile) {
+                    mapContainer.css('height', '400px');
+                } else {
+                    mapContainer.css('height', '300px'); // Высота для десктопов
+                }
+                
+                // УБЕРИТЕ overflow: hidden - это критично!
+                mapContainer.css('overflow', 'visible');
+                
+                const optimizedMapCode = optimizeMapForMobile(decodedMapCode);
+                const iframeHtml = createMapIframe(optimizedMapCode, listingId);
+                
+                mapContainer.html(iframeHtml);
+                button.data('map-loaded', true);
+                
+            } catch (error) {
+                console.error('Ошибка при вставке карты:', error);
+                mapContainer.html(createMapErrorHTML());
+                button.data('map-loaded', true);
+            }
+        } else {
+            mapContainer.html(createMapUnavailableHTML());
+            button.data('map-loaded', true);
+        }
+    }
+    
+    mapContainer.slideDown(300, function() {
+        initMobileMapHandlers(mapContainer, listingId);
+    });
+    
+    button.html('<i class="fas fa-times"></i> Скрыть карту');
+    button.removeClass('btn-outline-primary').addClass('btn-primary');
+}
+// Функция для скрытия карты
+function hideMap(mapContainer, button) {
+    mapContainer.slideUp(300, function() {
+        cleanupMapResources(mapContainer);
+    });
+    
+    // Сбрасываем флаг загрузки карты
+    button.data('map-loaded', false);
+    
+    button.html('<i class="fas fa-map-marker-alt"></i> Показать на карте');
+    button.removeClass('btn-primary').addClass('btn-outline-primary');
+}
+
+// Оптимизация карты для мобильных устройств
+function optimizeMapForMobile(mapCode) {
+    const viewportMeta = '<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">';
+    
+    // УНИВЕРСАЛЬНЫЕ стили для ВСЕХ устройств
+    const universalCSS = `
+        <style>
+            body, html { 
+                margin: 0; 
+                padding: 0; 
+                width: 100%;
+                height: 100%;
+                overflow: visible !important;
+            }
+            
+            .ymaps-2-1-79-map,
+            .ymaps-2-1-79-inner-panes,
+            .ymaps-2-1-79-ground-pane,
+            .ymaps-2-1-79-copyright,
+            .ymaps-2-1-79-controls,
+            .ymaps-2-1-79-controls__control,
+            .ymaps-2-1-79-copyright__wrap,
+            .ymaps-2-1-79-copyright__promo,
+            .ymaps-2-1-79-copyright__promo-link,
+            .map-widget-in-maps-button,
+            .button._view_air._size_small._link,
+            [class*="button"],
+            [class*="copyright"],
+            [class*="promo"] {
+                pointer-events: auto !important;
+                touch-action: auto !important;
+                -webkit-user-select: auto !important;
+                user-select: auto !important;
+                cursor: pointer !important;
+            }
+            
+            /* Разрешаем скролл и зуминг для всей карты */
+            .ymaps-2-1-79-map {
+                touch-action: pan-x pan-y pinch-zoom !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            /* Убираем любые блокировки событий */
+            .ymaps-2-1-79-events-pane,
+            .ymaps-2-1-79-user-selection-none,
+            .ymaps-2-1-79-islets__panes,
+            .ymaps-2-1-79-controls__control-toolbar,
+            .ymaps-2-1-79-controls__control {
+                pointer-events: auto !important;
+                -webkit-user-select: auto !important;
+                user-select: auto !important;
+                touch-action: auto !important;
+            }
+            
+            /* Гарантируем, что iframe не блокирует события */
+            iframe {
+                pointer-events: auto !important;
+            }
+        </style>
+    `;
+    
+    return mapCode.replace(/<head>/, `<head>${viewportMeta}${universalCSS}`);
+}
+// Создание iframe для карты с оптимизацией для мобильных
+function createMapIframe(mapCode, listingId) {
+    const blob = new Blob([mapCode], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    
+    return `
+        <iframe 
+            id="mapFrame${listingId}"
+            src="${blobUrl}"
+            style="width: 100%; height: 100%; border: none; display: block;"
+            loading="lazy"
+            allow="geolocation"
+            title="Карта объекта"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            referrerpolicy="no-referrer-when-downgrade"
+            scrolling="no"
+        ></iframe>
+    `;
+}
+
+// Создание HTML для ошибки загрузки карты
+function createMapErrorHTML() {
+    return `
+        <div class="h-100 d-flex align-items-center justify-content-center bg-light">
+            <div class="text-center text-muted">
+                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                <p>Ошибка загрузки карты</p>
+                <small>Попробуйте обновить страницу</small>
+            </div>
+        </div>
+    `;
+}
+
+// Создание HTML для недоступной карты
+function createMapUnavailableHTML() {
+    return `
+        <div class="h-100 d-flex align-items-center justify-content-center bg-light">
+            <div class="text-center text-muted">
+                <i class="fas fa-map-marked-alt fa-2x mb-2"></i>
+                <p>Карта недоступна</p>
+            </div>
+        </div>
+    `;
+}
+
+// Инициализация обработчиков для мобильных устройств
+function initMobileMapHandlers(mapContainer, listingId) {
+    const iframe = mapContainer.find('iframe');
+    
+    if (iframe.length > 0) {
+        iframe.on('load', function() {
+            try {
+                // Добавляем небольшую задержку для полной загрузки карты
+                setTimeout(() => {
+                    console.log('Карта загружена, кнопка должна быть доступна');
+                    
+                }, 1000);
+                
+            } catch (e) {
+                // Игнорируем ошибки CORS, но логируем
+                console.log('Карта загружена (CORS ограничения):', e);
+            }
+        });
+        
+        // Дополнительная проверка через 3 секунды
+        setTimeout(() => {
+            console.log('Проверка доступности кнопки карты для listing:', listingId);
+        }, 3000);
+    }
+}
+
+// Очистка ресурсов карты
+function cleanupMapResources(mapContainer) {
+    const iframe = mapContainer.find('iframe');
+    
+    if (iframe.length > 0) {
+        const src = iframe.attr('src');
+        if (src && src.startsWith('blob:')) {
+            URL.revokeObjectURL(src);
+        }
+        
+        // Очищаем содержимое iframe для освобождения памяти
+        iframe.attr('src', 'about:blank');
+    }
+    
+    mapContainer.empty();
+}
+
+// Глобальная очистка при уходе со страницы
+$(window).on('beforeunload', function() {
+    $('.map-container:visible').each(function() {
+        cleanupMapResources($(this));
+    });
+});
+
+// Обработка изменения ориентации на мобильных устройствах
+$(window).on('orientationchange', function() {
+    // Перезагружаем видимые карты при изменении ориентации
+    $('.map-container:visible').each(function() {
+        const mapContainer = $(this);
+        const iframe = mapContainer.find('iframe');
+        
+        if (iframe.length > 0) {
+            // Небольшая задержка для завершения анимации поворота
+            setTimeout(() => {
+                const currentSrc = iframe.attr('src');
+                iframe.attr('src', currentSrc); // Перезагружаем iframe
+            }, 300);
+        }
+    });
+});
 // Обработчик кнопки "Назад к категориям"
 $('#backToCategories').on('click', function() {
     // Возвращаем исходный заголовок
@@ -1632,10 +2368,10 @@ function addFieldClickHandlers() {
         spaceBetween: 0,
         loop: true,
         speed: 800,
-        autoplay: {
+        /*autoplay: {
             delay: 3000,
             disableOnInteraction: false,
-        },
+        },*/
         navigation: {
             nextEl: '.nav_next',
             prevEl: '.nav_prev',
@@ -1676,7 +2412,7 @@ function addFieldClickHandlers() {
                 e.preventDefault();
                 
                 // Останавливаем автопрокрутку при открытии подменю
-                swiper.autoplay.stop();
+                //swiper.autoplay.stop();
                 
                 // Закрываем все открытые подменю
                 document.querySelectorAll('.ul_second_nav').forEach(ul => {
@@ -1689,7 +2425,7 @@ function addFieldClickHandlers() {
                 if (submenu.style.display === 'block') {
                     submenu.style.display = 'none';
                     // Возобновляем автопрокрутку при закрытии подменюю
-                    swiper.autoplay.start();
+                    //swiper.autoplay.start();
                 } else {
                     submenu.style.display = 'block';
                 }
@@ -1704,7 +2440,7 @@ function addFieldClickHandlers() {
                 if (ul.style.display === 'block') {
                     ul.style.display = 'none';
                     // Возобновляем автопрокрутку при закрытии подменю
-                    swiper.autoplay.start();
+                    //swiper.autoplay.start();
                 }
             });
         }
@@ -1744,6 +2480,6 @@ function addFieldClickHandlers() {
     handleMobileView();
     window.addEventListener('resize', handleMobileView);
 });     
-    </script>
+</script>
     </body>
 </html>

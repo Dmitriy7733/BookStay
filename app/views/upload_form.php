@@ -984,7 +984,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <li class="nav-item"><a class="nav-link" href="?page=home#about">О сайте</a></li>
     <li class="nav-item"><a class="nav-link" href="?page=hotelier_dashboard">Личный кабинет</a></li>
     <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
-    <li class="nav-item"><a class="nav-link" href="?page=logout">Выход (<?= htmlspecialchars($_SESSION['username']) ?>)</a></li>
+    <li class="nav-item"><a class="nav-link" href="?page=logout">Выход </a></li>
 </ul>
         </div>
     </div>
@@ -1691,7 +1691,7 @@ function updatePreview() {
                             <ul class="goods__price_value">`;
     
     // Добавляем цены
-    document.querySelectorAll('.priceprice-input').forEach(input => {
+    document.querySelectorAll('.price-input').forEach(input => {
         if (input.value) {
             html += `<li>${input.previousElementSibling.textContent}: от ${input.value} руб.</li>`;
         }

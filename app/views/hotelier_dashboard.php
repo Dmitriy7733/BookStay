@@ -1,4 +1,25 @@
 <!-- app/views/hotelier_dashboard.php -->
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Проверка на аутентификацию и роль отельера
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'hotelier') {
+    // Перенаправить на страницу входа или вывести сообщение об ошибке
+    header('Location: index.php?page=login');
+    exit();
+}
+// Получаем данные из переданных переменных
+$totalListings = $stats['total'] ?? 0;
+$publishedListings = $stats['published'] ?? 0;
+$moderationListings = $stats['pending'] ?? 0;
+$rejectedListings = $stats['rejected'] ?? 0;
+$expiredListings = $stats['expired'] ?? 0;
+?>
+
+<?php //var_dump($totalListings, $publishedListings, $moderationListings, $rejectedListings); ?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -641,7 +662,9 @@
     overflow: hidden;
     transition: box-shadow 0.3s ease;
 }
-
+/*.goods {
+    position: relative;
+}*/
 .goods:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
@@ -956,80 +979,319 @@
 .position-relative:hover {
     opacity: 0.8;
 }
+.status-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+
+/* Обертка для стрелок карусели, чтобы располагать их по центру по вертикали */
+.carousel {
+    position: relative;
+}
+.carousel-controls {
+    position: absolute;
+    top: 50%; /* Расположить по вертикали по центру изображения */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    transform: translateY(-50%); /* Центрировать по вертикали */
+    z-index: 5;
+}
+.carousel-control-prev-custom,
+.carousel-control-next-custom {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+.carousel-control-prev-custom:hover,
+.carousel-control-next-custom:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Убираем стандартные стрелки Bootstrap, чтобы оставить только наши */
+.carousel-control-prev,
+.carousel-control-next {
+    display: none;
+}
+
     </style>
 </head>
 <body>
 
-<ul class="navbar-nav ml-auto">
-    <li class="nav-item"><a class="nav-link" href="?page=home">Главная</a></li>
-    <li class="nav-item"><a class="nav-link" href="?page=home#about">О сайте</a></li>
-    <li class="nav-item"><a class="nav-link" href="?page=hotelier_dashboard">Личный кабинет</a></li>
-    <li class="nav-item"><a class="nav-link" href="?page=hotelier_bookings">Управление бронированиями</a></li>
-    <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
-    <li class="nav-item"><a class="nav-link" href="?page=logout">Выход (<?= htmlspecialchars($_SESSION['username']) ?>)</a></li>
-</ul>
+<!-- Навигационная панель -->
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="/app/includes/free-icon-appliances.png" alt="Логотип" style="height: 40px; margin-right: 10px;">
+                Курортик
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="?page=home">Главная</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?page=home#about">О сайте</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?page=hotelier_dashboard">Личный кабинет</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?page=hotelier_bookings">Управление бронированиями</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?page=upload_form">Добавить объявление</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?page=logout">Выход (<?= htmlspecialchars($_SESSION['username']) ?>)</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
 
 <main class="container mt-4">
     <h1>Личный кабинет отельера</h1>
     <p>Добро пожаловать, <?= htmlspecialchars($_SESSION['username']) ?>!</p>
 
+    <!-- Статистика -->
     <div class="row mb-4">
-        <!-- Карточка со статистикой -->
-        <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Всего объявлений</h5>
-                    <p class="card-text display-4"><?= $totalListings ?></p>
-                </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Всего объявлений</h5>
+                <p class="card-text display-4"><?= $totalListings ?></p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Опубликовано</h5>
-                    <p class="card-text display-4"><?= $publishedListings ?></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">На модерации</h5>
-                    <p class="card-text display-4"><?= $moderationListings ?></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Отклонено</h5>
-                    <p class="card-text display-4"><?= $rejectedListings ?></p>
-                </div>
-            </div>
-        </ </div>
     </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Опубликовано</h5>
+                <p class="card-text display-4"><?= $publishedListings ?></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">На модерации</h5>
+                <p class="card-text display-4"><?= $moderationListings ?></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Отклонено</h5>
+                <p class="card-text display-4"><?= $rejectedListings ?></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-secondary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Истек срок</h5>
+                <p class="card-text display-4"><?= $expiredListings ?></p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <div class="list-group">
-        <a href="?page=upload_form" class="list-group-item list-group-item-action">
-            <i class="fas fa-plus-circle"></i> Добавить новое объявление
-        </a>
-        <a href="?page=hotelier_listings&status=all" class="list-group-item list-group-item-action">
-            <i class="fas fa-list"></i> Управление всеми объявлениями
-        </a>
-        <a href="?page=hotelier_listings&status=published" class="list-group-item list-group-item-action">
-            <i class="fas fa-check-circle"></i> Опубликованные объявления
-        </a>
-        <a href="?page=hotelier_listings&status=moderation" class="list-group-item list-group-item-action">
-            <i class="fas fa-hourglass-half"></i> Объявления на модерации
-        </a>
-        <a href="?page=hotelier_listings&status=rejected" class="list-group-item list-group-item-action">
-            <i class="fas fa-times-circle"></i> Отклоненные объявления
-        </a>
-        <a href="?page=hotelier_bookings" class="list-group-item list-group-item-action">
+    <!-- Меню управления -->
+    <div class="list-group mb-4">
+       <a href="?page=upload_form" class="list-group-item list-group-item-action">
+        <i class="fas fa-plus-circle"></i> Добавить новое объявление
+    </a>
+    <a href="?page=hotelier_dashboard" class="list-group-item list-group-item-action <?= ($currentStatus === 'all') ? 'active' : '' ?>">
+        <i class="fas fa-list"></i> Все объявления
+    </a>
+    <a href="?page=hotelier_dashboard&status=published" class="list-group-item list-group-item-action <?= ($currentStatus === 'published') ? 'active' : '' ?>">
+        <i class="fas fa-check-circle"></i> Опубликованные объявления
+    </a>
+    <a href="?page=hotelier_dashboard&status=pending" class="list-group-item list-group-item-action <?= ($currentStatus === 'pending') ? 'active' : '' ?>">
+        <i class="fas fa-hourglass-half"></i> Объявления на модерации
+    </a>
+    <a href="?page=hotelier_dashboard&status=rejected" class="list-group-item list-group-item-action <?= ($currentStatus === 'rejected') ? 'active' : '' ?>">
+        <i class="fas fa-times-circle"></i> Отклоненные объявления
+    </a>
+    <a href="?page=hotelier_dashboard&status=expired" class="list-group-item list-group-item-action <?= ($currentStatus === 'expired') ? 'active' : '' ?>">
+        <i class="fas fa-clock"></i> Истекшие объявления
+    </a>
+    <a href="?page=hotelier_bookings" class="list-group-item list-group-item-action">
         <i class="fas fa-calendar-alt"></i> Управление бронированиями
-        </a>
-    </div>
+    </a>
+</div>
+    <!-- Блок с объявлениями -->
+    <!-- Заголовок с указанием текущего фильтра -->
+    <h2>
+        <?php
+        $statusTitles = [
+            'all' => 'Все объявления',
+            'published' => 'Опубликованные объявления',
+            'pending' => 'Объявления на модерации',
+            'rejected' => 'Отклоненные объявления',
+            'expired' => 'Истекшие объявления'
+        ];
+        echo $statusTitles[$currentStatus] ?? 'Мои объявления';
+        ?>
+    </h2>
 
+    <div id="hotelierListings" class="row">
+        <?php if (!empty($userListings)): ?>
+            <?php foreach ($userListings as $listing): ?>
+                <div class="col-12 mb-4">
+                    <div class="card goods <?= $listing['status'] === 'expired' ? 'expired' : '' ?>">
+                        <div class="card-body">
+                            <!-- Статус -->
+                            <div class="mb-3">
+                                <span class="badge status-badge 
+                                    <?= $listing['status'] === 'published' ? 'badge-success' : '' ?>
+                                    <?= $listing['status'] === 'pending' ? 'badge-warning' : '' ?>
+                                    <?= $listing['status'] === 'rejected' ? 'badge-danger' : '' ?>
+                                    <?= $listing['status'] === 'expired' ? 'badge-secondary' : '' ?>">
+                                    <?= $listing['status'] === 'published' ? 'Опубликовано' : '' ?>
+                                    <?= $listing['status'] === 'pending' ? 'На модерации' : '' ?>
+                                    <?= $listing['status'] === 'rejected' ? 'Отклонено' : '' ?>
+                                    <?= $listing['status'] === 'expired' ? 'Истек срок' : '' ?>
+                                </span>
+                            </div>
+
+                            <div class="row">
+                                <!-- Фото -->
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="goods__image">
+                                        <div id="carouselListing<?= $listing['id'] ?>" class="carousel slide" data-ride="carousel">
+                                            <!-- Индикаторы -->
+                                            <?php if (count($listing['all_photos']) > 1): ?>
+                                            <ol class="carousel-indicators">
+                                                <?php foreach ($listing['all_photos'] as $index => $photo): ?>
+                                                <li data-target="#carouselListing<?= $listing['id'] ?>" data-slide-to="<?= $index ?>" class="<?= $index === 0 ? 'active' : '' ?>"></li>
+                                                <?php endforeach; ?>
+                                            </ol>
+                                            <?php endif; ?>
+
+                                            <!-- Слайды -->
+                                            <div class="carousel-inner">
+                                                <?php foreach ($listing['all_photos'] as $index => $photo): ?>
+                                                <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                                                    <img src="<?= htmlspecialchars($photo) ?>" class="d-block w-100" alt="Фото объекта <?= $index + 1 ?>" style="height: 200px; object-fit: cover;">
+                                                </div>
+                                                <?php endforeach; ?>
+                                            </div>
+
+                                            <!-- Пользовательские стрелки -->
+                                            <?php if (count($listing['all_photos']) > 1): ?>
+                                            <div class="carousel-controls">
+                                                <div class="carousel-control-prev-custom" data-target="#carouselListing<?= $listing['id'] ?>" data-slide="prev" role="button" aria-label="Предыдущий">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </div>
+                                                <div class="carousel-control-next-custom" data-target="#carouselListing<?= $listing['id'] ?>" data-slide="next" role="button" aria-label="Следующий">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Контент -->
+                                <div class="col-md-5">
+                                    <div class="goods__content">
+                                        <!-- Заголовок -->
+                                        <div class="goods__title mb-2">
+                                            <a href="/listing/<?= $listing['id'] ?>/" class="h5 text-dark font-weight-bold"><?= htmlspecialchars($listing['title']) ?></a>
+                                        </div>
+
+                                        <!-- Основная информация -->
+                                        <div class="goods__detail mb-3">
+                                            <ul class="list-unstyled mb-0">
+                                                <?php if ($listing['has_wifi']): ?>
+                                                    <li class="mb-1"><span class="text-danger">Wi-Fi бесплатно</span></li>
+                                                <?php endif; ?>
+                                                <li class="mb-1">
+                                                    <span class="d-inline-block px-2 py-1" style="border: 1px solid #c6e6f6; background: #cdf0f6; border-radius: 4px; color: rgba(8, 15, 23, 0.78);">
+                                                        <strong>До моря:</strong> <?= $listing['distance_to_sea'] ?>
+                                                    </span>
+                                                </li>
+                                                <li class="mb-1"><strong>Адрес:</strong> <?= htmlspecialchars($listing['address']) ?></li>
+                                                <?php if ($listing['has_parking']): ?>
+                                                    <li class="mb-1"><strong>Автостоянка:</strong> на территории (бесплатно)</li>
+                                                <?php endif; ?>
+                                                <li class="mb-1"><strong>Питание:</strong> <?= $listing['food_options'] ?></li>
+                                                <li class="mb-1"><strong>Телефоны:</strong> <?= htmlspecialchars($listing['phone']) ?></li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Отзывы -->
+                                        <div class="mb-3">
+    <span class="text-muted small">
+        <i class="fas fa-comments"></i> 
+        <a href="reviews.php?listing_id=<?= $listing['id'] ?>">
+            Отзывов: <?= $listing['reviews_count'] ?>
+        </a>
+    </span>
+</div>
+
+                                        <!-- Кнопки -->
+                                        <div class="listing-actions d-flex flex-wrap gap-2">
+                                            <a href="?page=edit_listing&id=<?= $listing['id'] ?>" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-edit"></i> Редактировать
+                                            </a>
+                                            <a href="?page=delete_listing&id=<?= $listing['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить это объявление?')">
+                                                <i class="fas fa-trash"></i> Удалить
+                                            </a>
+                                            <a href="?page=hotelier_bookings&listing_id=<?= $listing['id'] ?>" class="btn btn-info btn-sm">
+                                                <i class="fas fa-calendar-alt"></i> Бронирования
+                                            </a>
+                                            <?php if ($listing['status'] === 'rejected'): ?>
+                                                <a href="?page=edit_listing&id=<?= $listing['id'] ?>" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-exclamation-triangle"></i> Исправить
+                                                </a>
+                                            <?php endif; ?>
+                                            <?php if ($listing['status'] === 'expired'): ?>
+                                                <a href="?page=renew_listing&id=<?= $listing['id'] ?>" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-sync"></i> Опубликовать вновь
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Цены (если есть) -->
+                                <?php if (!empty($listing['prices'])): ?>
+                                <div class="col-md-3">
+                                    <div class="goods__info mb-3">
+                                        <div class="goods__price">
+                                            <div class="goods__price_title font-weight-bold mb-1">Цены за номер:</div>
+                                            <ul class="goods__price_value list-unstyled mb-0">
+                                                <?php foreach ($listing['prices'] as $price): ?>
+                                                    <li class="small"><?= $price['month'] ?>: от <?= $price['amount'] ?> руб.</li>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-12">
+                <div class="alert alert-info">
+                    У вас нет объявлений с выбранным статусом.
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 </main>
 
 <footer class="bg-secondary text-black text-center py-2">
@@ -1038,6 +1300,15 @@
     </div>
 </footer>
 
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// всплывающие подсказки Bootstrap
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 </body>
 </html>

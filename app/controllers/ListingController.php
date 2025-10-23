@@ -10,9 +10,9 @@ class ListingController {
         $this->model = new ListingModel($db);
     }
 
-    /**
-     * Получение списка объявлений по подкатегории
-     */
+    
+    //Получение списка объявлений по подкатегории
+    
     public function fetchListingsBySubcategory() {
         header('Content-Type: application/json');
         

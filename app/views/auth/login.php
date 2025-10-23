@@ -922,4 +922,3 @@ if (session_status() === PHP_SESSION_NONE) {
     </p>
 </div>
 </body>
-<?php include 'app/includes/footer.php'; ?>
